@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>rh200.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h2 id="strong-stylecolor-00b9e4%E9%87%8D%E8%A6%81%E9%85%8D%E7%BD%AE%E4%BF%A1%E6%81%AFstrong"><strong style='color: #00B9E4'>重要配置信息</strong></h2>
+<p>在练习期间，除了您就坐位置的台式机之外，还将使用多个虚拟系统。您不具有台式机系统的根访问权，但具有对虚拟系统的完全根访问权。</p>
+<h4 id="%E7%B3%BB%E7%BB%9F%E4%BF%A1%E6%81%AF">系统信息</h4>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">系统</th>
+<th style="text-align:center">IP 地址</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>servera.lab.example.com</code></td>
+<td style="text-align:center"><code>172.25.250.10</code></td>
+</tr>
+<tr>
+<td style="text-align:center"><code>serverb.lab.example.com</code></td>
+<td style="text-align:center"><code>172.25.250.11</code></td>
+</tr>
+</tbody>
+</table>
+<p>您使用的系统属于 DNS 域 <code>lab.example.com</code>。该域中的所有系统都位于 <code>172.25.250.0/255.255.255.0</code> 子网中，该子网中的所有系统都位于 <code>lab.example.com</code> 中。</p>
+<p>针对这些系统列出的 IP 地址是应该分配给系统的地址。您可能需要为一个或两个系统配置网络，以便能够通过上述地址访问您的地址。</p>
+<h4 id="%E5%B8%90%E6%88%B7%E4%BF%A1%E6%81%AF">帐户信息</h4>
+<p>servera 的 root 密码已经设置为 <code>flectrag</code> 。</p>
+<p>除非另有指定，否则这将是用于访问其他系统和服务的密码。此外，除非另有指定，否则应将该密码用于您创建的什么问题帐户或者需要设置密码的任意服务。</p>
+<h4 id="%E5%85%B6%E4%BB%96%E4%BF%A1%E6%81%AF">其他信息</h4>
+<p>您可以通过 SSH 或控制台访问练习系统（参见下文所述）。请注意，SSH 访问权可能取决于您解答其他练习项目的情况。</p>
+<p>如果您需要在系统上安装其他软件，可以使用位于以下地址的存储库：</p>
+<ul>
+<li>
+<p><code>http://content/rhel9.0/x86_64/dvd/BaseOS</code></p>
+</li>
+<li>
+<p><code>http://content/rhel9.0/x86_64/dvd/AppStream</code></p>
+</li>
+</ul>
+<h4 id="%E6%B3%A8%E5%86%8C%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%BF%A1%E6%81%AF">注册服务器信息</h4>
+<p>注册服务器地址<code>registry.lab.example.com</code></p>
+<p>使用 <code>admin</code> 作为用户名，使用 <code>redhat321</code> 作为映像注册表的凭据</p>
+<h4 id="%E9%87%8D%E8%A6%81%E8%AF%84%E6%B5%8B%E4%BF%A1%E6%81%AF">重要评测信息</h4>
+<p>您的系统会在重新引导后进行评测，因此务必确保您实施的的所有配置和服务在重新引导后仍然保留。服务必须在没有人工干预的情况下启动。</p>
+<p>同样，本次练习使用的所有虚拟实例都必须 能够重新引导至适当的多用户目标，而无需任何人工辅助。<strong style="color: red">在无法引导或无法进行无人干预引导的系统上完成的所有操作都将为零分。</strong></p>
+<h2 id="strong-stylecolor-00b9e4%E7%BB%83%E4%B9%A0%E8%A6%81%E6%B1%82strong"><strong style='color: #00B9E4'>练习要求</strong></h2>
+<p>在您的系统上执行以下所有步骤。</p>
+<p>[toc]</p>
+<h2 id="%E5%B0%8F%E6%8F%90%E7%A4%BA">小提示</h2>
+<pre class="hljs"><code><div>默认RHEL9中不允许root身份ssh node节点，如果正式考试时也不允许root登录，可以更改ssh配置文件或者先用普通用户登录后su - root
+【servera】
+以视图模式打开虚拟机servera，输入账号root，密码：xxxx 进入系统
+<span class="hljs-variable">$vim</span> /etc/ssh/sshd_config
+<span class="hljs-comment">#PermitRootLogin prohibit-password   #搜索/Per 找到PermitRootLogin选项在下面新添加一行，并取消注释</span>
+PermitRootLogin yes
+
+<span class="hljs-comment">#PasswordAuthentication yes    #搜索/Pas 找到PasswordAuthentication选项，在下面新添加一行</span>
+PasswordAuthentication yes 
+
+systemctl restart sshd
+
+</div></code></pre>
+<h3 id="%E5%9C%A8-serveralabexamplecom-%E4%B8%8A%E6%89%A7%E8%A1%8C%E4%BB%A5%E4%B8%8B%E4%BB%BB%E5%8A%A1">在 servera.lab.example.com 上执行以下任务</h3>
+<h4 id="1-%E9%85%8D%E7%BD%AE%E7%BD%91%E7%BB%9C%E8%AE%BE%E7%BD%AE">1. 配置网络设置</h4>
+<blockquote>
+<p><strong>将 servera 配置为具有以下网络配置：</strong></p>
+<ul>
+<li><input type="checkbox" id="checkbox0"><label for="checkbox0">主机名：</label><code>servera.lab.example.com</code></li>
+<li><input type="checkbox" id="checkbox1"><label for="checkbox1">IP 地址：</label><code>172.25.250.100</code></li>
+<li><input type="checkbox" id="checkbox2"><label for="checkbox2">子网掩码：</label><code>255.255.255.0</code></li>
+<li><input type="checkbox" id="checkbox3"><label for="checkbox3">网关：</label><code>172.25.250.254</code></li>
+<li><input type="checkbox" id="checkbox4"><label for="checkbox4">DNS服务器：</label><code>172.25.250.220</code></li>
+</ul>
+</blockquote>
+<p>在foundation0(物理机)上，按一下键盘上的Windows键或者点一下左上角的Activities，点击或搜索terminal终端，在终端中输入<code>virt-manager</code>命令，即可打开虚拟机管理器，双击servera，打开控制台，使用root身份登录</p>
+<p><strong>网络配置部分</strong></p>
+<p>nmcli 命令方法如下，但是更推荐使用nmtui命令：</p>
+<pre class="hljs"><code><div>[root@lixiaohui ~]<span class="hljs-comment"># nmcli connection modify 'Wired connection 1' \</span>
+ipv4.method manual \
+ipv4.addresses 172.25.250.100/24 \
+ipv4.gateway 172.25.250.254 \
+ipv4.dns 172.25.250.220 \
+connection.autoconnect yes
+
+[root@servera ~]<span class="hljs-comment"># nmcli connection down 'Wired connection 1'</span>
+[root@servera ~]<span class="hljs-comment"># nmcli connection up 'Wired connection 1'</span>
+</div></code></pre>
+<p><strong>主机名配置部分</strong></p>
+<p>主机名除了命令配置外，nmtui也可以直接网络和主机名一起配置</p>
+<pre class="hljs"><code><div>hostnamectl hostname servera.lab.example.com
+cat /etc/hostname
+servera.lab.example.com
+</div></code></pre>
+<h4 id="2-%E9%85%8D%E7%BD%AE%E6%82%A8%E7%9A%84%E7%B3%BB%E7%BB%9F%E4%BB%A5%E4%BD%BF%E7%94%A8%E9%BB%98%E8%AE%A4%E5%AD%98%E5%82%A8%E5%BA%93">2. 配置您的系统以使用默认存储库</h4>
+<blockquote>
+<p><strong>配置您 的系统以使用默认存储库</strong></p>
+<p>DNF 存储库的位置如下:</p>
+<ul>
+<li><input type="checkbox" id="checkbox5"><label for="checkbox5"></label><code>http://content/rhel9.0/x86_64/dvd/BaseOS</code></li>
+<li><input type="checkbox" id="checkbox6"><label for="checkbox6"></label><code>http://content/rhel9.0/x86_64/dvd/AppStream</code></li>
+</ul>
+<p>配置您的系统，以将这些位置用作默认存储库</p>
+</blockquote>
+<p>做好了第一个题之后，就回到物理机上，用terminal执行ssh到servera来做题，这样方便复制粘贴</p>
+<pre class="hljs"><code><div>ssh student@servera
+su - root
+password: flectrag
+</div></code></pre>
+<p>创建rhcsa.repo向系统添加仓库</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># vim /etc/yum.repos.d/rhcsa.repo</span>
+</div></code></pre>
+<pre class="hljs"><code><div><span class="hljs-section">[baseos]</span>
+<span class="hljs-attr">name</span>=BaseOS
+<span class="hljs-attr">baseurl</span>=http://content/rhel9.<span class="hljs-number">0</span>/x<span class="hljs-number">86_64</span>/dvd/BaseOS
+<span class="hljs-attr">enabled</span>=<span class="hljs-number">1</span>
+<span class="hljs-attr">gpgcheck</span>=<span class="hljs-number">0</span>
+<span class="hljs-section">[appstream]</span>
+<span class="hljs-attr">name</span>=AppStream
+<span class="hljs-attr">baseurl</span>=http://content/rhel9.<span class="hljs-number">0</span>/x<span class="hljs-number">86_64</span>/dvd/AppStream
+<span class="hljs-attr">enabled</span>=<span class="hljs-number">1</span>
+<span class="hljs-attr">gpgcheck</span>=<span class="hljs-number">0</span>
+</div></code></pre>
+<p>执行dnf repolist命令来测试仓库是否可用，出现5000多个软件包才是正常</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># dnf list available | wc -l</span>
+5986
+</div></code></pre>
+<h4 id="3-%E8%B0%83%E8%AF%95-selinux">3. 调试 SELinux</h4>
+<blockquote>
+<p><strong>调试 SELinux</strong></p>
+<p>非标准端口 <code>82</code> 上运行的 Web 服务器在提供内容时遇到问题。根据需要调试并解决问题，使其满足以下条件：</p>
+<ul>
+<li><input type="checkbox" id="checkbox7"><label for="checkbox7">系统上的 Web 服务器能够提供 </label><code>/var/www/html</code> 中所有现有的 HTML 文件（注：不要删除或以其他方式改动现有的文件内容）</li>
+<li><input type="checkbox" id="checkbox8"><label for="checkbox8">Web 服务器在端口 </label><code>82</code> 上提供此内容</li>
+<li><input type="checkbox" id="checkbox9"><label for="checkbox9">Web 服务器在系统启动时</label><code>自动启动</code></li>
+</ul>
+</blockquote>
+<p>查看所有Web内容的SELINUX标签状态，发现file1的标签是错误的</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># ll -Z /var/www/html/</span>
+total 12
+-rw-r--r--. 1 root root system_u:object_r:default_t:s0           14 Feb 17 06:07 file1
+-rw-r--r--. 1 root root system_u:object_r:httpd_sys_content_t:s0 14 Feb 17 06:07 file2
+-rw-r--r--. 1 root root system_u:object_r:httpd_sys_content_t:s0 14 Feb 17 06:07 file3
+</div></code></pre>
+<p>更正file1的SELINUX标签</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># semanage fcontext -m -t httpd_sys_content_t "/var/www/html/file1"</span>
+[root@servera ~]<span class="hljs-comment"># restorecon -RvF /var/www/html/file1</span>
+Relabeled /var/www/html/file1 from system_u:object_r:default_t:s0 to system_u:object_r:httpd_sys_content_t:s0
+[root@servera ~]<span class="hljs-comment"># ll -Z /var/www/html/</span>
+total 12
+-rw-r--r--. 1 root root system_u:object_r:httpd_sys_content_t:s0 14 Feb 17 06:07 file1
+-rw-r--r--. 1 root root system_u:object_r:httpd_sys_content_t:s0 14 Feb 17 06:07 file2
+-rw-r--r--. 1 root root system_u:object_r:httpd_sys_content_t:s0 14 Feb 17 06:07 file3
+</div></code></pre>
+<p>重新启动httpd服务，发现还是失败，从status中，看到绑定82端口为权限拒绝</p>
+<pre class="hljs"><code><div>systemctl restart httpd
+systemctl status httpd
+Permission denied: H00072: make_sock: could not <span class="hljs-built_in">bind</span> to address 0.0.0.0:82
+</div></code></pre>
+<p>查询selinux审计日志,其中会给出修改意见，此处选择主服务的type <code>http_port_t</code>，如果审计日志中，没有semanage port的命令，可以多次尝试restart httpd服务</p>
+<pre class="hljs"><code><div>sealert -a /var/<span class="hljs-built_in">log</span>/audit/audit.log
+...
+semanage port -a -t PORT_TYPE -p tcp 82
+<span class="hljs-built_in">where</span> PORT_TYPE is one of the following: `http_cache_port_t`, `http_port_t`, jboss_management_port_t, jboss_messaging_port_t, ntop_port_t, puppet_port_t.
+</div></code></pre>
+<p>将82号端口添加到httpd的服务中</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># semanage port -a -t http_port_t -p tcp 82</span>
+[root@servera ~]<span class="hljs-comment"># systemctl enable httpd --now</span>
+</div></code></pre>
+<p>开通防火墙</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># firewall-cmd --add-port=82/tcp --permanent</span>
+success
+[root@servera ~]<span class="hljs-comment"># firewall-cmd --reload</span>
+success
+</div></code></pre>
+<p>测试效果</p>
+<p>在物理机foundation上进行测试</p>
+<pre class="hljs"><code><div>[root@foundation0 ~]<span class="hljs-comment"># curl http://servera:82/file1</span>
+EX200 Testing
+[root@foundation0 ~]<span class="hljs-comment"># curl http://servera:82/file2</span>
+EX200 Testing
+[root@foundation0 ~]<span class="hljs-comment"># curl http://servera:82/file3</span>
+EX200 Testing
+</div></code></pre>
+<h4 id="4-%E5%88%9B%E5%BB%BA%E7%94%A8%E6%88%B7%E5%B8%90%E6%88%B7">4. 创建用户帐户</h4>
+<blockquote>
+<p><strong>创建用户帐户</strong></p>
+<p>创建下列用户、组和组成员资格：</p>
+<ul>
+<li><input type="checkbox" id="checkbox10"><label for="checkbox10">名为 </label><code>sysmgrs</code> 的组</li>
+<li><input type="checkbox" id="checkbox11"><label for="checkbox11">用户 </label><code>natasha</code> ，作为次要组从属于 <code>sysmgrs</code></li>
+<li><input type="checkbox" id="checkbox12"><label for="checkbox12">用户 </label><code>harry</code> ，作为次要组还从属于 <code>sysmgrs</code></li>
+<li><input type="checkbox" id="checkbox13"><label for="checkbox13">用户 </label><code>sarah</code> ，无权访问系统上的<code>交互式 shell</code> 且不是 <code>sysmgrs</code> 的成员</li>
+<li><input type="checkbox" id="checkbox14"><label for="checkbox14"></label><code>natasha</code> 、 <code>harry</code> 和 <code>sarah</code> 的密码应当都是 <code>flectrag</code></li>
+</ul>
+</blockquote>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># groupadd sysmgrs</span>
+[root@servera ~]<span class="hljs-comment"># useradd -G sysmgrs natasha</span>
+[root@servera ~]<span class="hljs-comment"># useradd -G sysmgrs harry</span>
+[root@servera ~]<span class="hljs-comment"># useradd -s /sbin/nologin sarah</span>
+[root@servera ~]<span class="hljs-comment"># echo flectrag | passwd --stdin natasha</span>
+Changing password <span class="hljs-keyword">for</span> user natasha.
+passwd: all authentication tokens updated successfully.
+[root@servera ~]<span class="hljs-comment"># echo flectrag | passwd --stdin harry</span>
+Changing password <span class="hljs-keyword">for</span> user harry.
+passwd: all authentication tokens updated successfully.
+[root@servera ~]<span class="hljs-comment"># echo flectrag | passwd --stdin sarah</span>
+Changing password <span class="hljs-keyword">for</span> user sarah.
+passwd: all authentication tokens updated successfully.
+</div></code></pre>
+<p>使用以下命令来测试效果</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># ssh natasha@localhost id</span>
+[root@servera ~]<span class="hljs-comment"># ssh harry@localhost id</span>
+[root@servera ~]<span class="hljs-comment"># ssh sarah@localhost id</span>
+[root@servera ~]<span class="hljs-comment"># grep ^sarah /etc/passwd</span>
+</div></code></pre>
+<h4 id="5-%E9%85%8D%E7%BD%AE-cron-%E4%BD%9C%E4%B8%9A">5. 配置 cron 作业</h4>
+<blockquote>
+<p><strong>配置 cron 作业</strong></p>
+<p>配置 <code>cron</code> 作业，以用户 <code>harry</code> 身份每天<code>14:23</code>分执行 <code>/usr/bin/echo hello</code></p>
+</blockquote>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># crontab -e -u harry</span>
+23 14 * * *     /usr/bin/<span class="hljs-built_in">echo</span> hello
+[root@servera ~]<span class="hljs-comment"># crontab -l -u harry</span>
+23 14 * * *     /usr/bin/<span class="hljs-built_in">echo</span> hello
+</div></code></pre>
+<p>确认效果的步骤可能无法实现，因为要到确切的时间才会触发，你只需要确保时间顺序正常就行</p>
+<h4 id="6-%E5%88%9B%E5%BB%BA%E5%8D%8F%E4%BD%9C%E7%9B%AE%E5%BD%95">6. 创建协作目录</h4>
+<blockquote>
+<p><strong>创建具有以下特征的协作目录 <code>/home/managers</code> ：</strong></p>
+<ul>
+<li><input type="checkbox" id="checkbox15"><label for="checkbox15"></label><code>/home/managers</code> 的组用权是 <code>sysmgrs</code></li>
+<li><input type="checkbox" id="checkbox16"><label for="checkbox16">目录应当可被 </label><code>sysmgrs</code> 的成员读取、写入和访问，但任何其他用户不具这些权限。（当然，root 用户有权访问系统上的所有文件和目录）</li>
+<li><input type="checkbox" id="checkbox17"><label for="checkbox17"></label><code>/home/managers</code> 中创建的文件自动将组所有权设置到 <code>sysmgrs</code> 组</li>
+</ul>
+</blockquote>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># mkdir /home/managers</span>
+[root@servera ~]<span class="hljs-comment"># chgrp sysmgrs /home/managers</span>
+[root@servera ~]<span class="hljs-comment"># chmod g=rwx,o=- /home/managers</span>
+[root@servera ~]<span class="hljs-comment"># chmod g+s /home/managers/</span>
+</div></code></pre>
+<p>测试效果：</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># ll -d /home/managers/</span>
+drwxrws---. 2 root sysmgrs 6 Feb 17 06:30 /home/managers/
+[root@servera ~]<span class="hljs-comment"># touch /home/managers/rootfile</span>
+[root@servera ~]<span class="hljs-comment"># ll /home/managers/rootfile</span>
+-rw-r--r--. 1 root sysmgrs 0 Feb 17 06:31 /home/managers/rootfile
+[root@servera ~]<span class="hljs-comment"># rm -rf /home/managers/rootfile</span>
+</div></code></pre>
+<h4 id="7-%E9%85%8D%E7%BD%AE-ntp">7. 配置 NTP</h4>
+<blockquote>
+<p><strong>配置 NTP</strong></p>
+<p>配置您的系统，使其成为 <code>materials.example.com</code> 的 NTP 客户端。（注：<code>materials.example.com</code> 是 <code>classroom.example.com</code> 的 DNS 别名）</p>
+</blockquote>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># systemctl enable chronyd --now</span>
+[root@servera ~]<span class="hljs-comment"># vim /etc/chrony.conf</span>
+...
+server materials.example.com iburst
+...
+[root@servera ~]<span class="hljs-comment"># systemctl restart chronyd</span>
+[root@servera ~]<span class="hljs-comment"># chronyc sources -v</span>
+...
+^* classroom.example.com         8   6     7     2   -113us[ -28.7s] +/- 1473us
+</div></code></pre>
+<h4 id="8-%E9%85%8D%E7%BD%AE-autofs">8. 配置 autofs</h4>
+<blockquote>
+<p><strong>配置 autofs</strong></p>
+<p>配置 <code>autofs</code> ，以按照如下所述自动挂载远程用户的主目录：</p>
+<ul>
+<li><input type="checkbox" id="checkbox18"><label for="checkbox18"></label><code>materials.example.com</code> ( <code>172.25.254.254</code> ) NFS 导出 <code>/rhome</code> 到您的系统。此文件系统包含为用户 <code>remoteuser1</code> 预配置的主目录</li>
+<li><input type="checkbox" id="checkbox19"><label for="checkbox19"></label><code>remoteuser1</code> 的主目录是 <code>materials.example.com:/rhome/remoteuser1</code></li>
+<li><input type="checkbox" id="checkbox20"><label for="checkbox20"></label><code>remoteuser1</code> 的主目录应自动挂载到本地 <code>/rhome</code> 下的 <code>/rhome/remoteuser1</code></li>
+<li><input type="checkbox" id="checkbox21"><label for="checkbox21">主目录必须可供其用户</label><code>写入</code></li>
+<li><input type="checkbox" id="checkbox22"><label for="checkbox22"></label><code>remoteuser1</code> 的密码是 <code>flectrag</code></li>
+</ul>
+</blockquote>
+<p>安装autofs服务</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># dnf install autofs -y</span>
+</div></code></pre>
+<p>编辑autofs间接挂载</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># vim /etc/auto.master</span>
+...
+/rhome  /etc/auto.rhome
+[root@servera ~]<span class="hljs-comment"># vim /etc/auto.rhome</span>
+<span class="hljs-comment"># 这里的auto.rhome文件如果无法背住格式，可以cp /etc/auto.misc /etc/auto.rhome</span>
+remoteuser1 -fstype=nfs,rw materials.example.com:/rhome/remoteuser1
+</div></code></pre>
+<p>启用并启动服务</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># systemctl enable autofs --now</span>
+</div></code></pre>
+<p>测试效果：</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># ssh remoteuser1@localhost</span>
+remoteuser1@localhost<span class="hljs-string">'s password: 
+[remoteuser1@servera ~]$ touch testfile
+[remoteuser1@servera ~]$ df -h
+Filesystem                                Size  Used Avail Use% Mounted on
+...
+materials.example.com:/rhome/remoteuser1   50G  1.9G   49G   4% /rhome/remoteuser1
+[remoteuser1@servera ~]$ exit
+</span></div></code></pre>
+<h4 id="9%E9%85%8D%E7%BD%AE%E7%94%A8%E6%88%B7%E5%B8%90%E5%8F%B7">9.配置用户帐号</h4>
+<blockquote>
+<p>配置用户 <code>manalo</code> ，其用户 ID 为 <code>3533</code>。此用户的密码应当为 <code>flectrag</code>。</p>
+</blockquote>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># useradd -u 3533 manalo</span>
+[root@servera ~]<span class="hljs-comment"># echo flectrag | passwd --stdin manalo</span>
+Changing password <span class="hljs-keyword">for</span> user manalo.
+passwd: all authentication tokens updated successfully.
+[root@servera ~]<span class="hljs-comment"># id manalo</span>
+uid=3533(manalo) gid=3533(manalo) groups=3533(manalo)
+[root@servera ~]<span class="hljs-comment"># ssh manalo@localhost id</span>
+manalo@localhost<span class="hljs-string">'s password: flectrag
+uid=3533(manalo) gid=3533(manalo) groups=3533(manalo)
+</span></div></code></pre>
+<h4 id="10-%E6%9F%A5%E6%89%BE%E6%96%87%E4%BB%B6">10. 查找文件</h4>
+<blockquote>
+<p><strong>查找文件</strong></p>
+<p>查找归 <code>jacques</code> 所有的所有文件并将其副本放入 <code>/root/findfiles</code> 目录</p>
+</blockquote>
+<p>cp复制不要忘了 <code>-a</code> 选项， <code>-a</code> 可以确保拷贝过去的文件依旧属于此人所有</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># mkdir /root/findfiles</span>
+[root@servera ~]<span class="hljs-comment"># find / -user jacques -exec cp -a {} /root/findfiles \;</span>
+find: ‘/proc/2200/task/2200/fd/7’: No such file or directory
+find: ‘/proc/2200/task/2200/fdinfo/7’: No such file or directory
+find: ‘/proc/2200/fd/8’: No such file or directory
+find: ‘/proc/2200/fdinfo/8’: No such file or directory
+[root@servera ~]<span class="hljs-comment"># ll /root/findfiles/</span>
+total 0
+-rw-r--r--. 1 jacques root    0 Feb 17 06:07 gamelan
+-rw-r--r--. 1 jacques jacques 0 Feb 17 06:07 jacques
+-rw-r--r--. 1 jacques root    0 Feb 17 06:07 libWedgeit.so.1.2.3
+</div></code></pre>
+<h4 id="11-%E6%9F%A5%E6%89%BE%E5%AD%97%E7%AC%A6%E4%B8%B2">11. 查找字符串</h4>
+<blockquote>
+<p><strong>查找字符串</strong></p>
+<p>查找文件 <code>/usr/share/xml/iso-codes/iso_639_3.xml</code> 中包含字符串 <code>ng</code> 的所有行。将所有这些行的副本按原始顺序放在文件 <code>/root/list</code> 中。 <code>/root/list</code> 不得包含空行，且所有行必须是 <code>/usr/share/xml/iso-codes/iso_639_3.xml</code> 中原始行的确切副本。</p>
+</blockquote>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># grep ng /usr/share/xml/iso-codes/iso_639_3.xml &gt; /root/list</span>
+[root@servera ~]<span class="hljs-comment"># cat /root/list</span>
+</div></code></pre>
+<h4 id="12-%E5%88%9B%E5%BB%BA%E5%AD%98%E6%A1%A3">12. 创建存档</h4>
+<blockquote>
+<p><strong>创建存档</strong></p>
+<p>创建一个名为 <code>/root/backup.tar</code> 的 tar 存档，其应包含 <code>/usr/local</code> 的 tar 存档，其应包含 <code>/usr/local</code> 的内容。该 tar 存档必须使用 bzip2 进行压缩。</p>
+</blockquote>
+<p>如果忘记哪个参数是bzip2，可以使用tar --help | grep bzip2获取</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># tar cjf /root/backup.tar /usr/local</span>
+tar: Removing leading `/<span class="hljs-string">' from member names
+[root@servera ~]# file /root/backup.tar.gz 
+/root/backup.tar.gz: bzip2 compressed data
+</span></div></code></pre>
+<h4 id="13-%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F">13.  创建一个容器镜像</h4>
+<blockquote>
+<p><strong>创建一个容器镜像</strong></p>
+<ul>
+<li><input type="checkbox" id="checkbox23"><label for="checkbox23"> </label><code>wallah</code> 用户，下载 http://classroom/Containerfile</li>
+<li><input type="checkbox" id="checkbox24"><label for="checkbox24"> 不要修改这个文件内容，构建镜像名为 </label><code>pdf</code></li>
+</ul>
+</blockquote>
+<p>使用 <code>ssh方式</code> 登录本机，安装容器工具，并登录容器镜像仓库</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># ssh wallah@localhost</span>
+password: flectrag
+[wallah@servera user]$ sudo dnf install container-tools -y
+[wallah@servera user]$ podman login -u admin -p redhat321 registry.lab.example.com
+</div></code></pre>
+<p>下载文件并构建镜像</p>
+<pre class="hljs"><code><div>[wallah@servera user]$ wget http://classroom/Containerfile
+[wallah@servera user]$ podman build -t pdf .
+</div></code></pre>
+<h4 id="14-%E5%B0%86%E5%AE%B9%E5%99%A8%E9%85%8D%E7%BD%AE%E4%B8%BA%E6%9C%8D%E5%8A%A1">14. 将容器配置为服务</h4>
+<blockquote>
+<p><strong>将容器配置为服务</strong></p>
+<ul>
+<li>
+<p><input type="checkbox" id="checkbox25"><label for="checkbox25"></label><code>wallah</code> 用户，配置一个 systemd 服务</p>
+</li>
+<li>
+<p><input type="checkbox" id="checkbox26"><label for="checkbox26">容器名称为</label><code>ascii2pdf</code></p>
+</li>
+<li>
+<p><input type="checkbox" id="checkbox27"><label for="checkbox27">使用刚创建的镜像</label><code>pdf</code></p>
+</li>
+<li>
+<p><input type="checkbox" id="checkbox28"><label for="checkbox28">该服务命名为 </label><code>container-ascii2pdf</code> ，并在系统重启时自动启动，无需干预</p>
+</li>
+<li>
+<p><input type="checkbox" id="checkbox29"><label for="checkbox29">将服务配置为在启动时自动将   </label><code>/opt/file</code> 挂载到容器中的 <code>/dir1</code> 下；<code>/opt/progress</code> 挂载到容器中的 <code>/dir2</code> 下；</p>
+</li>
+</ul>
+</blockquote>
+<p>根据教材指导，使用 <code>ssh方式</code> 用wallah用户登录本机</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># ssh wallah@localhost</span>
+password: flectrag
+</div></code></pre>
+<p>根据题目参数，构建podman容器</p>
+<pre class="hljs"><code><div>[wallah@servera user]$ podman run -d --name ascii2pdf -v /opt/file:/dir1:Z -v /opt/progress:/dir2:Z pdf
+</div></code></pre>
+<p>验证容器是否能够在后台持续运行</p>
+<pre class="hljs"><code><div>[wallah@servera user]$ podman ps
+</div></code></pre>
+<p>停止podman容器，但是不要删除，我们用此容器生成user级别的unit文件，如果不记得mkdir 后面的路径，可以man systemd.unit查询用户的unit搜索路径</p>
+<pre class="hljs"><code><div>[wallah@servera user]$ podman stop ascii2pdf
+[wallah@servera user]$ mkdir -p ~/.config/systemd/user/
+[wallah@servera user]$ <span class="hljs-built_in">cd</span> ~/.config/systemd/user/
+[wallah@servera user]$ podman generate systemd --name ascii2pdf -f
+[wallah@servera user]$ systemctl --user daemon-reload
+[wallah@servera user]$ systemctl --user <span class="hljs-built_in">enable</span> container-ascii2pdf --now
+[wallah@servera user]$ systemctl --user status container-ascii2pdf
+</div></code></pre>
+<p>除了enable了user级别的服务之外，还需要执行loginctl命令让服务随服务器启动</p>
+<pre class="hljs"><code><div>[wallah@servera user]$ loginctl <span class="hljs-built_in">enable</span>-linger
+[wallah@servera user]$ loginctl show-user wallah
+...
+Linger=yes
+</div></code></pre>
+<h4 id="15-%E6%B7%BB%E5%8A%A0sudo%E5%85%8D%E5%AF%86%E6%93%8D%E4%BD%9C">15. 添加sudo免密操作</h4>
+<blockquote>
+<p><strong>添加sudo免密操作</strong></p>
+<ul>
+<li><input type="checkbox" id="checkbox30"><label for="checkbox30">允许</label><code>sysmgrs</code>组成员sudo时不需要密码</li>
+</ul>
+</blockquote>
+<p>在/etc/sudoers中，本来就有一条类似的条目，我们只需要复制并粘贴一行，改改名字即可，如果不记得文件路径，也可以使用visudo命令回车打开此文件</p>
+<p>添加sysmgrs的sudo权限</p>
+<p>vim进来或者visudo命令回车之后直接输入:110并回车，来到110行，并追加如下内容</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># vim /etc/sudoers</span>
+%sysmgrs  ALL=(ALL)  NOPASSWD: ALL
+</div></code></pre>
+<p>注意这个文件在保存时需要加上感叹号来强制保存</p>
+<p>测试效果</p>
+<pre class="hljs"><code><div>[root@servera ~]<span class="hljs-comment"># su - harry</span>
+[harry@servera ~]$ sudo useradd usertest
+[harry@servera ~]$ tail -n1 /etc/passwd
+usertest:x:3534:3534::/home/usertest:/bin/bash
+[harry@servera ~]$ sudo userdel -r usertest
+[harry@servera ~]$ <span class="hljs-built_in">exit</span>
+</div></code></pre>
+<hr>
+<h3 id="%E5%9C%A8-serverblabexamplecom-%E4%B8%8A%E6%89%A7%E8%A1%8C%E4%BB%A5%E4%B8%8B%E4%BB%BB%E5%8A%A1">在 serverb.lab.example.com 上执行以下任务</h3>
+<h4 id="16-%E8%AE%BE%E7%BD%AE-root-%E5%AF%86%E7%A0%81">16. 设置 root 密码</h4>
+<blockquote>
+<p><strong>设置 root 密码</strong></p>
+<p>将 serverb 的 root 密码设置为 <code>flectrag</code> 。您需要获得系统访问权限才能进行此操作。</p>
+</blockquote>
+<p>在foundation0(物理机)上，按一下键盘上的Windows键或者点一下左上角的Activities，点击或搜索terminal终端，在终端中输入<code>virt-manager</code>命令，即可打开虚拟机管理器，双击serverb，打开控制台，点击 <code>send key</code>--&gt; <code>Ctrl+Alt+Delete</code> 使其重启，在重启过程中，不断的按上下键，打断其启动，使白色选择性停留在第一个正常的启动菜单上，选中后，按下键盘的 <code>e</code> 键</p>
+<p>找到linux开头这行，在这行按下 <code>end</code> 键，在后方输入rd.break console=tty0，然后按下ctrl+x键来启动系统，注意rd.break和console=tty0直接有一个空格</p>
+<p>or</p>
+<p>删除linux开头行中ro后的本行部分，删除后，在后方输入rd.break console=tty0，然后按下ctrl+x键来启动系统，注意rd.break和console=tty0直接有一个空格</p>
+<p>按下ctrl+x后系统会启动，在启动停止后，按下回车键，然后输入以下内容完成密码更改</p>
+<pre class="hljs"><code><div>switch_root:/<span class="hljs-comment"># mount -o remount,rw /sysroot</span>
+switch_root:/<span class="hljs-comment"># chroot /sysroot</span>
+sh-4.2<span class="hljs-comment"># echo flectrag | passwd --stdin root</span>
+sh-4.2<span class="hljs-comment"># touch /.autorelabel</span>
+sh-4.2<span class="hljs-comment"># exit</span>
+sh-4.2<span class="hljs-comment"># exit</span>
+</div></code></pre>
+<h4 id="17-%E9%85%8D%E7%BD%AE%E6%82%A8%E7%9A%84%E7%B3%BB%E7%BB%9F%E4%BB%A5%E4%BD%BF%E7%94%A8%E9%BB%98%E8%AE%A4%E5%AD%98%E5%82%A8%E5%BA%93">17. 配置您的系统以使用默认存储库</h4>
+<blockquote>
+<p><strong>配置您 的系统以使用默认存储库</strong></p>
+<p>DNF 存储库的位置如下:</p>
+<ul>
+<li><input type="checkbox" id="checkbox31"><label for="checkbox31"></label><code>http://content/rhel9.0/x86_64/dvd/BaseOS</code></li>
+<li><input type="checkbox" id="checkbox32"><label for="checkbox32"></label><code>http://content/rhel9.0/x86_64/dvd/AppStream</code></li>
+</ul>
+<p>配置您的系统，以将这些位置用作默认存储库</p>
+</blockquote>
+<p>直接复制过来上一个机器的即可</p>
+<pre class="hljs"><code><div>scp root@servera:/etc/yum.repos.d/rhcsa.repo /etc/yum.repos.d/
+</div></code></pre>
+<p>或者重新做一下</p>
+<p>创建rhcsa.repo向系统添加仓库</p>
+<pre class="hljs"><code><div>[root@serverb ~]<span class="hljs-comment"># vim /etc/yum.repos.d/rhcsa.repo</span>
+</div></code></pre>
+<pre class="hljs"><code><div><span class="hljs-section">[baseos]</span>
+<span class="hljs-attr">name</span>=BaseOS
+<span class="hljs-attr">baseurl</span>=http://content/rhel9.<span class="hljs-number">0</span>/x<span class="hljs-number">86_64</span>/dvd/BaseOS
+<span class="hljs-attr">enabled</span>=<span class="hljs-number">1</span>
+<span class="hljs-attr">gpgcheck</span>=<span class="hljs-number">0</span>
+<span class="hljs-section">[appstream]</span>
+<span class="hljs-attr">name</span>=AppStream
+<span class="hljs-attr">baseurl</span>=http://content/rhel9.<span class="hljs-number">0</span>/x<span class="hljs-number">86_64</span>/dvd/AppStream
+<span class="hljs-attr">enabled</span>=<span class="hljs-number">1</span>
+<span class="hljs-attr">gpgcheck</span>=<span class="hljs-number">0</span>
+</div></code></pre>
+<p>执行dnf repolist命令来测试仓库是否可用，出现5000多个软件包才是正常</p>
+<pre class="hljs"><code><div>[root@serverb ~]<span class="hljs-comment"># dnf list available | wc -l</span>
+5986
+</div></code></pre>
+<h4 id="18-%E8%B0%83%E6%95%B4%E9%80%BB%E8%BE%91%E5%8D%B7%E5%A4%A7%E5%B0%8F">18. 调整逻辑卷大小</h4>
+<blockquote>
+<p><strong>设置逻辑卷大小</strong></p>
+<p>将逻辑卷 <code>vo</code> 及其文件系统的大小调整到 <code>230</code> MiB。确保文件系统内容保持不变。注：分区大小很少与请求的大小完全相同，因此可以接受范围为 <code>213</code> MiB 到 <code>243</code> MiB 的大小。</p>
+</blockquote>
+<p>确认逻辑卷状态</p>
+<p>lv大小为184M，文件系统为175M，直接调整为可接受的范围，例如230M或240M，只要在其题目给出的范围内即可，自行决定大小，以下举例为240M</p>
+<pre class="hljs"><code><div>[root@serverb ~]<span class="hljs-comment"># lvs</span>
+  LV   VG     Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  vo   myvol  -wi-ao---- 184.00m                                                    
+  swap vgroup -wi-ao---- 256.00m                                                    
+[root@serverb ~]<span class="hljs-comment"># df -h</span>
+Filesystem            Size  Used Avail Use% Mounted on
+...
+/dev/mapper/myvol-vo  175M  1.6M  160M   1% /reports
+</div></code></pre>
+<p>扩展LV大小</p>
+<pre class="hljs"><code><div>[root@serverb ~]<span class="hljs-comment"># lvextend -L 240M /dev/myvol/vo -r</span>
+  Size of logical volume myvol/vo changed from 184.00 MiB (46 extents) to 240.00 MiB (60 extents).
+  Logical volume myvol/vo successfully resized.
+resize2fs 1.45.4 (23-Sep-2019)
+Filesystem at /dev/mapper/myvol-vo is mounted on /reports; on-line resizing required
+old_desc_blocks = 2, new_desc_blocks = 2
+The filesystem on /dev/mapper/myvol-vo is now 245760 (1k) blocks long.
+</div></code></pre>
+<p>扩展文件系统</p>
+<p>如果在上一个步骤中忘记了执行-r参数再执行这一个步骤，如果指定了-r参数，就只需要df -h确认就可以，不需要执行这个步骤。</p>
+<p>用blkid来确认其文件系统格式，然后用对应的命令完成扩展</p>
+<pre class="hljs"><code><div>[root@serverb ~]<span class="hljs-comment"># blkid | grep myvol</span>
+[root@serverb ~]<span class="hljs-comment"># resize2fs /dev/myvol/vo</span>
+</div></code></pre>
+<p>效果确认</p>
+<pre class="hljs"><code><div>[root@serverb ~]<span class="hljs-comment"># lvs</span>
+  LV   VG     Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  vo   myvol  -wi-ao---- 240.00m                                                    
+  swap vgroup -wi-ao---- 256.00m                                                    
+[root@serverb ~]<span class="hljs-comment"># df -h</span>
+Filesystem            Size  Used Avail Use% Mounted on
+...
+/dev/mapper/myvol-vo  229M  2.1M  212M   1% /reports
+</div></code></pre>
+<h4 id="19-%E6%B7%BB%E5%8A%A0%E4%BA%A4%E6%8D%A2%E5%88%86%E5%8C%BA">19. 添加交换分区</h4>
+<blockquote>
+<p><strong>添加交换分区</strong></p>
+<p>向您的系统添加一个额外的交换分区 <code>512MiB</code> 。交换分区应在系统<code>启动时自动挂载</code>。不要删除或以任何方式改动系统上的任何现有交换分区。</p>
+</blockquote>
+<p>确认分区情况</p>
+<p>lsblk发现vdb还有剩余空间，且下面有题要求使用全新磁盘，所以决定使用vdb</p>
+<p>划分分区并设置分区类型，在Hex code这里，要自己输入L，然后查看哪个是swap，然后再输入代码</p>
+<pre class="hljs"><code><div>[root@serverb ~]<span class="hljs-comment"># fdisk /dev/vdb</span>
+
+Welcome to fdisk (util-linux 2.32.1).
+Changes will remain <span class="hljs-keyword">in</span> memory only, until you decide to write them.
+Be careful before using the write <span class="hljs-built_in">command</span>.
+
+
+Command (m <span class="hljs-keyword">for</span> <span class="hljs-built_in">help</span>): n
+Partition <span class="hljs-built_in">type</span>
+   p   primary (2 primary, 0 extended, 2 free)
+   e   extended (container <span class="hljs-keyword">for</span> logical partitions)
+Select (default p): p
+Partition number (3,4, default 3): 3
+First sector (2095106-8388607, default 2097152): 
+Last sector, +sectors or +size{K,M,G,T,P} (2097152-8388607, default 8388607): +756M
+
+Created a new partition 3 of <span class="hljs-built_in">type</span> <span class="hljs-string">'Linux'</span> and of size 756 MiB.
+
+Command (m <span class="hljs-keyword">for</span> <span class="hljs-built_in">help</span>): t
+Partition number (1-3, default 3): 3
+Hex code (<span class="hljs-built_in">type</span> L to list all codes): 82
+
+Changed <span class="hljs-built_in">type</span> of partition <span class="hljs-string">'Linux'</span> to <span class="hljs-string">'Linux swap / Solaris'</span>.
+
+Command (m <span class="hljs-keyword">for</span> <span class="hljs-built_in">help</span>): w
+The partition table has been altered.
+Syncing disks.
+
+[root@serverb ~]<span class="hljs-comment"># </span>
+</div></code></pre>
+<p>格式化并挂载</p>
+<p>刚才分区时，提示我们分区号为3，所以应该格式化的对象是/dev/vdb3</p>
+<pre class="hljs"><code><div>[root@serverb ~]<span class="hljs-comment"># mkswap /dev/vdb3</span>
+Setting up swapspace version 1, size = 756 MiB (792719360 bytes)
+no label, UUID=0e0a8486-3ea7-43b2-b505-5971da4cebe5
+[root@serverb ~]<span class="hljs-comment"># swapon /dev/vdb3</span>
+[root@serverb ~]<span class="hljs-comment"># blkid | grep vdb3</span>
+/dev/vdb3: UUID=<span class="hljs-string">"0e0a8486-3ea7-43b2-b505-5971da4cebe5"</span> TYPE=<span class="hljs-string">"swap"</span> PARTUUID=<span class="hljs-string">"1aae66ac-03"</span>
+</div></code></pre>
+<p>将上述中的uuid复制一下，并将其按照格式追加到/etc/fstab</p>
+<pre class="hljs"><code><div>[root@serverb ~]<span class="hljs-comment"># vim /etc/fstab</span>
+UUID=<span class="hljs-string">"0e0a8486-3ea7-43b2-b505-5971da4cebe5"</span> swap swap defaults 0 0
+[root@serverb ~]<span class="hljs-comment"># mount -a</span>
+</div></code></pre>
+<p>验证效果</p>
+<pre class="hljs"><code><div>[root@serverb ~]<span class="hljs-comment"># free -m</span>
+              total        used        free      shared  buff/cache   available
+Mem:           1826         183        1349          16         294        1482
+Swap:          1011           0        1011
+[root@serverb ~]<span class="hljs-comment"># swapon -s</span>
+Filename                Type        Size    Used    Priority
+/dev/dm-0                                  partition    262140    0    -2
+/dev/vdb3                                  partition    774140    0    -3
+</div></code></pre>
+<h4 id="20-%E5%88%9B%E5%BB%BA%E9%80%BB%E8%BE%91%E5%8D%B7">20. 创建逻辑卷</h4>
+<blockquote>
+<p><strong>创建逻辑卷</strong></p>
+<p>根据如下要求，创建新的逻辑卷：</p>
+<ul>
+<li><input type="checkbox" id="checkbox33"><label for="checkbox33">逻辑卷取名为 </label><code>qa</code> ，属于 <code>qagroup</code> 卷组，大小为 <code>60</code> 个扩展块</li>
+<li><input type="checkbox" id="checkbox34"><label for="checkbox34"></label><code>qagroup</code> 卷组中逻辑卷的扩展块大小应当为 <code>16 MiB</code></li>
+<li><input type="checkbox" id="checkbox35"><label for="checkbox35">使用 </label><code>vfat</code> 文件系统格式化新逻辑卷。该逻辑卷应在系统启动时自动挂载到 <code>/mnt/qa</code> 下</li>
+</ul>
+</blockquote>
+<p><code>考试的时候看情况，如果后面没有题目需要分区了，第四个分区号可以直接划分为主分区，否则，按照步骤划分扩展分区</code></p>
+<p>新建扩展分区</p>
+<p>根据上一题新建swap分区时的提示，已经是vdb3，所以我们已经要用到第四个主分区了，所以此时需要先新建一个用掉硬盘剩余所有空间的扩展分区，考试时是否新建扩展分区就看是否正在使用第四个分区号，如果要新建第四个分区号，就创建一个用掉硬盘剩余所有空间的扩展分区，然后从扩展分区中再划分想要的逻辑分区</p>
+<p>新建类型为e的分区时，first sector和last sector处直接回车即可，不要输入任何内容，分好扩展分区之后，新建逻辑分区时，给一个略大于题目要求的后端分区，例如2G，如果w保存之后，报告任何busy之类的字眼，请重新启动一下这台虚拟机</p>
+<pre class="hljs"><code><div>[root@serverb ~]<span class="hljs-comment"># fdisk /dev/vdb</span>
+
+Welcome to fdisk (util-linux 2.32.1).
+Changes will remain <span class="hljs-keyword">in</span> memory only, until you decide to write them.
+Be careful before using the write <span class="hljs-built_in">command</span>.
+
+
+Command (m <span class="hljs-keyword">for</span> <span class="hljs-built_in">help</span>): n
+Partition <span class="hljs-built_in">type</span>
+   p   primary (3 primary, 0 extended, 1 free)
+   e   extended (container <span class="hljs-keyword">for</span> logical partitions)
+Select (default e): e
+
+Selected partition 4
+First sector (2095106-8388607, default 3645440): 
+Last sector, +sectors or +size{K,M,G,T,P} (3645440-8388607, default 8388607): 
+
+Created a new partition 4 of <span class="hljs-built_in">type</span> <span class="hljs-string">'Extended'</span> and of size 2.3 GiB.
+
+Command (m <span class="hljs-keyword">for</span> <span class="hljs-built_in">help</span>): n
+All primary partitions are <span class="hljs-keyword">in</span> use.
+Adding logical partition 5
+First sector (3647488-8388607, default 3647488): 
+Last sector, +sectors or +size{K,M,G,T,P} (3647488-8388607, default 8388607): +2G
+
+Created a new partition 5 of <span class="hljs-built_in">type</span> <span class="hljs-string">'Linux'</span> and of size 2 GiB.
+
+Command (m <span class="hljs-keyword">for</span> <span class="hljs-built_in">help</span>): t
+Partition number (1-5, default 5): 5
+Hex code (<span class="hljs-built_in">type</span> L to list all codes): 8e
+
+Changed <span class="hljs-built_in">type</span> of partition <span class="hljs-string">'Linux'</span> to <span class="hljs-string">'Linux LVM'</span>.
+
+Command (m <span class="hljs-keyword">for</span> <span class="hljs-built_in">help</span>): w
+The partition table has been altered.
+Failed to add partition 5 to system: Device or resource busy
+
+The kernel still uses the old partitions. The new table will be used at the next reboot. 
+Syncing disks.
+
+[root@serverb ~]<span class="hljs-comment"># reboot</span>
+</div></code></pre>
+<p>创建逻辑卷</p>
+<pre class="hljs"><code><div>[root@serverb ~]<span class="hljs-comment"># pvcreate /dev/vdb5</span>
+  Physical volume <span class="hljs-string">"/dev/vdb5"</span> successfully created.
+[root@serverb ~]<span class="hljs-comment"># vgcreate -s 16M qagroup /dev/vdb5</span>
+  Volume group <span class="hljs-string">"qagroup"</span> successfully created
+[root@serverb ~]<span class="hljs-comment"># lvcreate -l 60 -n qa qagroup</span>
+  Logical volume <span class="hljs-string">"qa"</span> created.
+[root@serverb ~]<span class="hljs-comment"># vgdisplay qagroup</span>
+  --- Volume group ---
+  VG Name               qagroup
+  System ID             
+  Format                lvm2
+  Metadata Areas        1
+  Metadata Sequence No  2
+  VG Access             <span class="hljs-built_in">read</span>/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                1
+  Open LV               0
+  Max PV                0
+  Cur PV                1
+  Act PV                1
+  VG Size               1.98 GiB
+  PE Size               16.00 MiB
+  Total PE              127
+  Alloc PE / Size       60 / 960.00 MiB
+  Free  PE / Size       67 / &lt;1.05 GiB
+  VG UUID               y7dEXm-HOWU-Sjz6-P1uf-Cwr7-KeeF-NdOCqx
+
+[root@serverb ~]<span class="hljs-comment"># lvdisplay /dev/qagroup/qa</span>
+  --- Logical volume ---
+  LV Path                /dev/qagroup/qa
+  LV Name                qa
+  VG Name                qagroup
+  LV UUID                aZ0kI7-QbS1-b9nx-KVht-uyRS-Ui9x-zjmvgT
+  LV Write Access        <span class="hljs-built_in">read</span>/write
+  LV Creation host, time serverb.domain250.example.com, 2022-02-17 08:19:34 -0500
+  LV Status              available
+  <span class="hljs-comment"># open                 0</span>
+  LV Size                960.00 MiB
+  Current LE             60
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently <span class="hljs-built_in">set</span> to     8192
+  Block device           253:2
+</div></code></pre>
+<p>格式化挂载</p>
+<pre class="hljs"><code><div>[root@serverb ~]<span class="hljs-comment"># mkfs.vfat /dev/qagroup/qa</span>
+[root@serverb ~]<span class="hljs-comment"># mkdir /mnt/qa</span>
+[root@serverb ~]<span class="hljs-comment"># blkid | grep qa</span>
+/dev/mapper/qagroup-qa: UUID=<span class="hljs-string">"FEC3-90F3"</span> SEC_TYPE=<span class="hljs-string">"ext2"</span> TYPE=<span class="hljs-string">"vfat"</span>
+</div></code></pre>
+<p>确认uuid，并复制UUID，然后按照格式追加到/etc/fstab中</p>
+<pre class="hljs"><code><div>[root@serverb ~]<span class="hljs-comment"># vim /etc/fstab</span>
+UUID=<span class="hljs-string">"FEC3-90F3"</span> /mnt/qa vfat defaults 0 0
+[root@serverb ~]<span class="hljs-comment"># mount -a</span>
+</div></code></pre>
+<h4 id="21-%E9%85%8D%E7%BD%AE%E7%B3%BB%E7%BB%9F%E8%B0%83%E4%BC%98">21. 配置系统调优</h4>
+<blockquote>
+<p><strong>配置系统调优</strong></p>
+<p>为您的系统选择建议的 <code>tuned</code> 配置集并将它设为默认设置。</p>
+</blockquote>
+<pre class="hljs"><code><div>[root@serverb ~]<span class="hljs-comment"># dnf install tuned -y</span>
+Package tuned-2.13.0-6.el8.noarch is already installed.
+...
+[root@serverb ~]<span class="hljs-comment"># systemctl enable tuned --now</span>
+[root@serverb ~]<span class="hljs-comment"># tuned-adm recommend</span>
+virtual-guest
+[root@serverb ~]<span class="hljs-comment"># tuned-adm profile virtual-guest</span>
+[root@serverb ~]<span class="hljs-comment"># tuned-adm active</span>
+Current active profile: virtual-guest
+</div></code></pre>
+
+</body>
+</html>
