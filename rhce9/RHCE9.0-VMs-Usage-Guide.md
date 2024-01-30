@@ -13,8 +13,8 @@
 
 |角色|账号|密码|
 |-|-|-|
-|foundation|root</br>kiosk|Asimov</br>redhat|
-|所有其他虚拟机|root</br>student|redhat</br>student|
+|foundation|root<br>kiosk|Asimov<br>redhat|
+|所有其他虚拟机|root<br>student|redhat<br>student|
 
 ## 准备工作
 
