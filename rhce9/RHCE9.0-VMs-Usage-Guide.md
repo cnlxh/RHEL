@@ -131,7 +131,9 @@ bash reset-vm.sh
 
 注意每本书第一章前面的课堂环境介绍，以下内容有先后顺序，reset的时候 `请务必按照顺序` 
 
-### 准备classroom
+### 初始化虚拟机
+
+以下是classroom虚拟机的操作例子，请按照此例子对所有虚拟机执行reset和vmview
 
 执行以下命令让 classroom 开机
 
@@ -148,7 +150,7 @@ rht-vmview view classroom
 ```
 ![confirm-classroom](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vm-usage-guide/confirm-classroom.png)
 
-依次类推，需要按照顺序，将其他虚拟机开机，具体顺序为：
+classroo必须先reset开机，然后依次类推，需要按照顺序，将其他虚拟机开机，具体顺序为：
 
 1. bastion
 
