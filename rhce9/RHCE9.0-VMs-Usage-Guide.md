@@ -133,7 +133,7 @@ bash reset-vm.sh
 
 ### 初始化虚拟机
 
-以下是classroom虚拟机的操作例子，请按照此例子对所有虚拟机执行reset和vmview
+以下是classroom虚拟机的操作例子，请按照此例子对所有虚拟机 `按照顺序分别` 执行reset和vmview
 
 执行以下命令让 classroom 开机
 
@@ -150,7 +150,7 @@ rht-vmview view classroom
 ```
 ![confirm-classroom](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vm-usage-guide/confirm-classroom.png)
 
-classroom必须先reset开机，然后依次类推，需要按照顺序，将其他虚拟机开机，具体顺序为：
+classroom必须先reset开机，然后依次类推，需要按照顺序，将其他虚拟机reset开机，具体顺序为：
 
 1. bastion
 
