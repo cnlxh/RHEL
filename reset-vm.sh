@@ -7,7 +7,7 @@
 
 # setting course
 read -p "Which course do you want to set: " course
-echo "Seting course to $course"
+echo "Setting course to $course"
 rht-clearcourse 0 &> /dev/null
 rht-setcourse $course &> /dev/null
 if [ $? -ne 0 ];then
