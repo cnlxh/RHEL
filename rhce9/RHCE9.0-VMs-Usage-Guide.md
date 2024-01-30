@@ -150,7 +150,7 @@ rht-vmview view classroom
 ```
 ![confirm-classroom](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vm-usage-guide/confirm-classroom.png)
 
-classroo必须先reset开机，然后依次类推，需要按照顺序，将其他虚拟机开机，具体顺序为：
+classroom必须先reset开机，然后依次类推，需要按照顺序，将其他虚拟机开机，具体顺序为：
 
 1. bastion
 
