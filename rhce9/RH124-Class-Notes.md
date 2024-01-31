@@ -118,7 +118,7 @@ CentOS Stream 是 RHEL 的上游项⽬，不提供支持。Fedora测试好的软
 
 以上三者之间的区别如下所示：
 
-![fedora-centos-rhel-dff](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/rh124/fedora-centos-rhel-dff.png)
+![fedora-centos-rhel-dff](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/rh124/fedora-centos-rhel-diff.png)
 
 ## RHEL 操作系统下载
 
