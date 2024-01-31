@@ -43,18 +43,7 @@ https://www.vmware.com/go/getworkstation-win
 
 至此，我们已经可以用ssh工具来远程连接我们的VMware 虚拟机了
 
-## 自动初始化虚拟机环境
-
-推荐使用此方法来初始化虚拟机环境，省时省力还省心，如果无法执行的情况下，再考虑使用下方的 `手工初始化虚拟机环境`
-
-1. 恢复最开始`虚拟机自带`的快照，并使虚拟机开机
-
-2. 下载自动初始化虚拟机的脚本，下载链接如下，直接用你的下载工具下载，下载完名字叫`reset-vm.sh`
-
-```bash
-https://gitee.com/cnlxh/rhel/raw/master/reset-vm.sh
- ```
-3. 使用MobaXterm等工具将下载好的`reset-vm.sh`上传到foundation0上，在MobaXterm上用`kiosk`身份登录foundation0后，上传到foundation虚拟机中的`/home/kiosk/`
+### 使用SSH 工具远程连接环境
 
 MobaXterm工具下载地址如下：
 
@@ -62,7 +51,7 @@ MobaXterm工具下载地址如下：
 https://download.mobatek.net/2362023122033030/MobaXterm_Portable_v23.6.zip
 ```
 
-登录和上传步骤如下：
+登录服务器步骤如下：
 
 解压并打开下载好的MobaXterm软件，点击左上角的 `session` 按钮
 
@@ -76,7 +65,19 @@ https://download.mobatek.net/2362023122033030/MobaXterm_Portable_v23.6.zip
 
 ![foundation-kiosk-password](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/mobaxterm/foundation-kiosk-password.png)
 
-点击左侧的SFTP按钮，确认我们位于 `/home/kiosk/`，点击上传按钮，将我们下载好的 `reset-vm.sh` 上传到/home/kiosk下
+## 自动初始化虚拟机环境
+
+推荐使用此方法来初始化虚拟机环境，省时省力还省心，如果无法执行的情况下，再考虑使用下方的 `手工初始化虚拟机环境`
+
+1. 恢复最开始`虚拟机自带`的快照，并使虚拟机开机
+
+2. 下载自动初始化虚拟机的脚本，下载链接如下，直接用你的下载工具下载，下载完名字叫`reset-vm.sh`
+
+```bash
+https://gitee.com/cnlxh/rhel/raw/master/reset-vm.sh
+ ```
+
+3. 点击左侧的SFTP按钮，确认我们位于 `/home/kiosk/`，点击上传按钮，将我们下载好的 `reset-vm.sh` 上传到/home/kiosk下
 
 ![mobaxterm-sftp](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/mobaxterm/mobaxterm-sftp.png)
 
@@ -93,8 +94,10 @@ https://download.mobatek.net/2362023122033030/MobaXterm_Portable_v23.6.zip
 执行命令如下：
 
 ```bash
-cd /home/kiosk
-bash reset-vm.sh
+[kiosk@foundation0 ~]$ cd /home/kiosk
+[kiosk@foundation0 ~]$ bash reset-vm.sh
+Which course do you want to set:
+
 ```
 
 ## 手工初始化虚拟机环境
@@ -133,7 +136,7 @@ bash reset-vm.sh
 
 ### 初始化虚拟机
 
-以下是classroom虚拟机的操作例子，请按照此例子对所有虚拟机 `按照顺序分别` 执行reset和vmview
+以下是classroom虚拟机的操作例子，请按照此例子对所有虚拟机 `按照顺序分别` 执行reset和vmview，每台机器看到login提示符之后，才能操作下一个机器的reset和vmview
 
 执行以下命令让 classroom 开机
 
