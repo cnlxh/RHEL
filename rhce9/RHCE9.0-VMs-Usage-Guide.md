@@ -9,6 +9,13 @@
 
 # RHCE 9.0 虚拟机环境使用指南
 
+## 课程环境硬件需求
+
+|CPU|内存|硬盘|操作系统|软件版本|
+|-|-|-|-|-|
+|10代i5以上|至少16G，推荐32G|至少100G SSD|Windows10 x64|至少VMware Workstaion 17或同级版本的Fustion<br>7z解压缩软件用于解压虚拟机|
+
+
 ## 虚拟机账号密码
 
 |角色|账号|密码|
@@ -25,6 +32,7 @@
 ```textile
 https://www.vmware.com/go/getworkstation-win
 ```
+
 ### 修改VMware 虚拟机的网卡信息
 
 为了更顺利的使用ssh工具连接虚拟机，需要在安装好VMware的情况下，将虚拟机所使用的网络修改为 `VMnet1`，并将VMnet1的网络修改为 `172.25.254.250/24` 网段
@@ -42,6 +50,34 @@ https://www.vmware.com/go/getworkstation-win
 ![vm-network-confirm](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vmware/vm-network-confirm.png)
 
 至此，我们已经可以用ssh工具来远程连接我们的VMware 虚拟机了
+
+### 导入虚拟机
+
+你下载的资料如果是很多压缩包，例如xxx.7z之类的字眼，就解压一下，会得到VMware 的原始文件，如果是下载的VMware 原始文件，例如xxx.vmdk，在所有文件都下载完成后，执行下一步的导入操作，不管是解压的还是直接下载的，最后你都会得到一个文件夹，我们的虚拟机都从这个文件夹中导入，具体步骤如下：
+
+打开已安装的VMware workstation软件，点击软件左上角的 `文件` ---> `打开` ，双击你得到的文件夹，找到RHCE90.vmx`或其他名字但后缀名是vmx的文件
+
+![menu-file-open](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vmware/menu-file-open.png)
+
+双击文件夹后，会看到一个 `RHCE90.vmx` 或是其他名字但后缀是 `vmx` 的文件，选中后，点击 `打开` 按钮就可以导入此虚拟机了
+
+![open-rhce9-vm](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vmware/open-rhce9-vm.png)
+
+如果你的硬件较强，可以点击 `编辑虚拟机设置` 添加更多的内存和CPU，有助于你的使用体验，请注意内存至少需要分配16G，低于此配置，需要你个人测试是否可运行，低于16G内存不在红帽官方支持的范围内
+
+我们使用VMnet1来SSH远程连接虚拟机，所以需要确保我们的虚拟机已选中VMnet1网卡，点击 `编辑虚拟机设置` 
+
+![edit-vm-setting](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vmware/edit-vm-setting.png)
+
+我们需要确保选中了 `网络适配器`，设备状态处于 `启动时连接`，网络连接已勾选 `仅主机模式`，仅主机模式就是VMnet1，请务必选择这个模式，后续我们将通过此模式SSH连接虚拟机，完成后，点击 `确定` 按钮
+
+![confirm-vmnet1-at-vm](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vmware/confirm-vmnet1-at-vm.png)
+
+
+如果配置调整完成，点击 `开启此虚拟机`
+
+![start-vm](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vmware/start-vm.png)
+
 
 ### 使用SSH 工具远程连接环境
 
