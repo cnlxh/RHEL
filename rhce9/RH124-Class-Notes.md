@@ -582,3 +582,594 @@ ls: cannot access '/tmp/folder1': No such file or directory
 
 mv 命令可将⽂件从⼀个位置移动到另⼀个位置，如果源路径和目标路径是同样的路径，但目前文件名和源文件名不同，将是重命名效果
 
+**文件移动**
+
+```bash
+[lixiaohui@host1 ~]$ touch /tmp/file1
+[lixiaohui@host1 ~]$ mkdir /tmp/folder1
+[lixiaohui@host1 ~]$ ls -l /tmp/folder1
+total 0
+[lixiaohui@host1 ~]$ mv /tmp/file1 /tmp/folder1/
+[lixiaohui@host1 ~]$ ls -l /tmp/folder1/
+total 0
+-rw-r--r--. 1 lixiaohui lixiaohui 0 Feb  1 22:50 file1
+
+```
+
+**文件重命名**
+
+```bash
+[lixiaohui@host1 ~]$ ll /tmp/folder1/
+total 0
+-rw-r--r--. 1 lixiaohui lixiaohui 0 Feb  1 22:50 file1
+[lixiaohui@host1 ~]$
+[lixiaohui@host1 ~]$ mv /tmp/folder1/file1 /tmp/folder1/file2
+[lixiaohui@host1 ~]$ ll /tmp/folder1/
+total 0
+-rw-r--r--. 1 lixiaohui lixiaohui 0 Feb  1 22:50 file2
+```
+
+## 删除⽂件和⽬录
+
+1. rm 默认删除文件，但是不删除目录，可以加上`-r`递归选项来同时删除非空目录
+
+2. rm 可以跟上`-i` 在删除具体文件时，问你是否删除，跟上`-f` 来不提示且强制删除
+
+3. rm -rf 可以删除文件以及所有目录，此操作强制静默执行目录的递归删除
+
+```bash
+[lixiaohui@host1 ~]$ ll /tmp/folder1/
+total 0
+-rw-r--r--. 1 lixiaohui lixiaohui 0 Feb  1 22:50 file2
+[lixiaohui@host1 ~]$
+[lixiaohui@host1 ~]$ rm /tmp/folder1/file2
+[lixiaohui@host1 ~]$ ll /tmp/folder1/file2
+ls: cannot access '/tmp/folder1/file2': No such file or directory
+
+[lixiaohui@host1 ~]$ touch /tmp/folder1/lxhtest
+[lixiaohui@host1 ~]$ rm -i /tmp/folder1/lxhtest
+rm: remove regular empty file '/tmp/folder1/lxhtest'? y
+
+[lixiaohui@host1 ~]$ ls /tmp/folder1/
+file1  file10  file2  file3  file4  file5  file6  file7  file8  file9  lxhtest
+[lixiaohui@host1 ~]$ rm -rf /tmp/folder1/*
+[lixiaohui@host1 ~]$ ll /tmp/folder1/
+total 0
+
+```
+
+## 创建硬链接
+
+每个文件在系统中都会有一个唯一的`索引节点编号`，也被称为`inode号码`，硬链接就是直接把硬盘中的数据`在多处显示`，而不是在硬盘中复制多份，所以，多次创建同一个文件的硬链接并`不会多次占用空间`，硬链接没有源文件和目标文件的说法，所以所谓的源文件被删除，所谓的目标文件依旧可用，因为它们是硬盘中的同一份数据的多个位置显示，删除文件只是取消在某处的显示，但由于硬链接对inode强依赖，而inode是而格式化分区时产生的，所以硬链接不能 `跨格式化`，也就是说不能跨设备实现，而且硬链接也不能对文件夹实现
+
+
+以下例子中，所有的硬链接都具有相同的编号： `268964355`
+```bash
+[lixiaohui@host1 ~]$ touch /tmp/folder1/lxhfile1
+[lixiaohui@host1 ~]$ ls -i /tmp/folder1/lxhfile1
+268964355 /tmp/folder1/lxhfile1
+[lixiaohui@host1 ~]$ ln /tmp/folder1/lxhfile1 /home/lixiaohui/lxhtest
+[lixiaohui@host1 ~]$ ls -li /home/lixiaohui/lxhtest /tmp/folder1/lxhfile1
+268964355 -rw-r--r--. 2 lixiaohui lixiaohui 0 Feb  1 23:04 /home/lixiaohui/lxhtest
+268964355 -rw-r--r--. 2 lixiaohui lixiaohui 0 Feb  1 23:04 /tmp/folder1/lxhfile1
+
+```
+
+## 创建软链接
+
+ln 命令 -s 选项可创建符号链接，也称为“软链接”
+
+软连接可以`跨设备`、也可以做`目录软链接`，但是每次做软链接都是创建了一个文的链接文件，类似于Windows中的快捷方式，软连接严重依赖源文件，当源文件被删除，链接文件就会失效
+
+```bash
+[lixiaohui@host1 ~]$ ll -i /tmp/folder1/lxhfile1
+268964355 -rw-r--r--. 2 lixiaohui lixiaohui 0 Feb  1 23:04 /tmp/folder1/lxhfile1
+[lixiaohui@host1 ~]$ echo source date > /tmp/folder1/lxhfile1
+
+[lixiaohui@host1 ~]$ ln -s /tmp/folder1/lxhfile1 /home/lixiaohui/lxhsoft
+[lixiaohui@host1 ~]$ ll -i /tmp/folder1/lxhfile1 /home/lixiaohui/lxhsoft
+268965142 lrwxrwxrwx. 1 lixiaohui lixiaohui 21 Feb  1 23:11 /home/lixiaohui/lxhsoft -> /tmp/folder1/lxhfile1
+268964355 -rw-r--r--. 2 lixiaohui lixiaohui 12 Feb  1 23:11 /tmp/folder1/lxhfile1
+
+[lixiaohui@host1 ~]$ rm -rf /tmp/folder1/lxhfile1
+[lixiaohui@host1 ~]$ ll -i /home/lixiaohui/lxhsoft
+268965142 lrwxrwxrwx. 1 lixiaohui lixiaohui 21 Feb  1 23:11 /home/lixiaohui/lxhsoft -> /tmp/folder1/lxhfile1
+[lixiaohui@host1 ~]$ cat /home/lixiaohui/lxhsoft
+cat: /home/lixiaohui/lxhsoft: No such file or directory
+
+```
+
+## 使⽤ Shell 扩展匹配⽂件名
+
+下⽅是 Bash shell 执⾏的主要扩展：
+- ⼤括号扩展，可以⽣成多个字符串
+- 波形符扩展，扩展⾄⽤⼾主⽬录路径
+- 变量扩展，将⽂本替换为 shell 变量中存储的值
+- 命令替换，将⽂本替换为命令的输出
+- 路径名扩展，帮助按模式匹配选择⼀个或多个⽂件
+
+路径名扩展以前称为通配，是 Bash 最有⽤的功能之⼀。
+
+### 路径名扩展和模式匹配
+
+```bash
+[lixiaohui@host1 ~]$ mkdir glob; cd glob
+[lixiaohui@host1 glob]$ touch alfa bravo charlie delta echo able baker cast dog easy
+[lixiaohui@host1 glob]$ ls
+able  alfa  baker  bravo  cast  charlie  delta  dog  easy  echo
+[lixiaohui@host1 glob]$ ls a*
+able  alfa
+[lixiaohui@host1 glob]$ ls *a*
+able  alfa  baker  bravo  cast  charlie  delta  easy
+[lixiaohui@host1 glob]$ ls [ac]*
+able  alfa  cast  charlie
+[lixiaohui@host1 glob]$ ls ????
+able  alfa  cast  easy  echo
+[lixiaohui@host1 glob]$ ls ?????
+baker  bravo  delta
+
+```
+
+### ⼤括号扩展
+
+```bash
+[lixiaohui@host1 glob]$ echo {Sunday,Monday,Tuesday,Wednesday}.log
+Sunday.log Monday.log Tuesday.log Wednesday.log
+[lixiaohui@host1 glob]$ echo file{1..3}.txt
+file1.txt file2.txt file3.txt
+[lixiaohui@host1 glob]$ echo file{a..c}.txt
+filea.txt fileb.txt filec.txt
+[lixiaohui@host1 glob]$  echo file{a,b}{1,2}.txt
+filea1.txt filea2.txt fileb1.txt fileb2.txt
+[lixiaohui@host1 glob]$  echo file{a{1,2},b,c}.txt
+filea1.txt filea2.txt fileb.txt filec.txt
+[lixiaohui@host1 glob]$ mkdir ../RHEL{7,8,9}
+[lixiaohui@host1 glob]$ ls ../RHEL*
+../RHEL7:
+
+../RHEL8:
+
+../RHEL9:
+
+```
+
+### 波形符扩展
+
+```bash
+[lixiaohui@host1 glob]$ echo ~root
+/root
+[lixiaohui@host1 glob]$ echo ~lixiaohui
+/home/lixiaohui
+[lixiaohui@host1 glob]$ echo ~nonexistinguser
+~nonexistinguser
+[lixiaohui@host1 glob]$ pwd
+/home/lixiaohui/glob
+[lixiaohui@host1 glob]$ cd ~/glob/
+
+```
+
+### 变量扩展
+
+变量名称只能包含字⺟（⼤写和⼩写）、数字和下划线。变量名称区分⼤⼩写，不能以数字开头。
+
+变量的赋值和引用
+
+```bash
+[lixiaohui@host1 glob]$ username=lixiaohui
+[lixiaohui@host1 glob]$ echo $username
+lixiaohui
+
+```
+要预防因其他 shell 扩展⽽引起的错误，可以将变量的名称放在⼤括号中
+
+```bash
+[lixiaohui@host1 glob]$ username=lixiaohui
+[lixiaohui@host1 glob]$ echo ${username}
+lixiaohui
+
+```
+
+### 命令替换
+
+命令替换允许命令的输出替换命令⾏上的命令本⾝。当命令括在括号中并且前⾯有美元符号 `$` 时，会发⽣命令替换。$(command) 形式可以互相嵌套多个命令扩展。
+
+```bash
+[lixiaohui@host1 glob]$  echo Today is $(date +%A).
+Today is Thursday.
+[lixiaohui@host1 glob]$ echo The time is $(date +%M) minutes past $(date +%l%p).
+The time is 25 minutes past 11PM.
+
+```
+
+### 防⽌参数被扩展
+
+在 Bash shell 中，许多字符有特殊含义。为防⽌命令⾏的某些部分上执⾏ shell 扩展，可以为字符和字符串加引号或执⾏转义。反斜杠 `\` 是 Bash shell 中的转义字符。它可以防⽌其后的字符被扩展
+
+```bash
+[lixiaohui@host1 glob]$ echo The value of $HOME is your home directory.
+The value of /home/lixiaohui is your home directory.
+[lixiaohui@host1 glob]$ echo The value of \$HOME is your home directory.
+The value of $HOME is your home directory.
+[lixiaohui@host1 glob]$ myhost=$(hostname -s); echo $myhost
+host1
+[lixiaohui@host1 glob]$ echo "***** hostname is ${myhost} *****"
+***** hostname is host1 *****
+[lixiaohui@host1 glob]$ echo "Will variable $myhost evaluate to $(hostname -s)?"
+Will variable host1 evaluate to host1?
+[lixiaohui@host1 glob]$ echo 'Will variable $myhost evaluate to $(hostname -s)?'
+Will variable $myhost evaluate to $(hostname -s)?
+
+```
+
+# 第四章 在红帽企业 Linux 中获取帮助
+
+## 常规命令帮助
+
+```bash
+[lixiaohui@host1 ~]$ useradd --help
+[lixiaohui@host1 ~]$ useradd -h
+
+```
+
+## Man 手册
+
+本地系统上通常可⽤的⽂档来源之⼀是系统⼿册⻚或 man page。软件包随附这些⻚⾯来提供⽂档，可以使⽤ man 命令从命令⾏访问它们。⻚⾯存储在 /usr/share/man ⽬录的⼦⽬录中。
+
+man page 源⾃过去的 Linux 程序员⼿册，该⼿册篇幅很⻓，⾜以划分为多个章节。每个章节包含有关特定主题的信息
+
+|章节|内容类型|描述|
+|-|-|-|
+|1|⽤⼾命令|可执⾏命令和 shell 程序|
+|2|系统调⽤|从⽤⼾空间调⽤的内核例程|
+|3|库函数|由程序库提供|
+|4|特殊⽂件|例如设备⽂件|
+|5|⽂件格式|⽤于许多配置⽂件和结构|
+|6|游戏和屏保|过去的趣味程序章节|
+|7|惯例、标准和其他|协议和⽂件系统|
+|8|系统管理和特权命令|维护任务|
+|9|Linux 内核 API|内部内核调⽤|
+
+查看帮助的方法：
+
+我们注意到，不是所有的命令都有所有的章节，而且也不一定要输入章节数字，没有数字就进入默认章节
+
+```bash
+[lixiaohui@host1 ~]$ man 5 useradd
+No manual entry for useradd in section 5
+[lixiaohui@host1 ~]$ man passwd
+[lixiaohui@host1 ~]$ man 5 passwd
+
+```
+
+man 手册非常长，可以考虑以下办法快速查看内容：
+
+1. `up和down`： 向上或向下滚一屏
+
+2. `上下键`： 向上或向下滚一行
+
+3. `/string`： 搜索特定的内容
+
+4. `n`：在搜索后输入小写的n，可以以锁定的关键字查找下一个匹配项
+
+5. `N`：在搜索后输入大写的N，可以以锁定的关键字查找上一个匹配项
+
+6. `g`: 小写的g可以回到第一屏
+
+7. `G`：大写G可以去掉最后一屏
+
+8. `q`： 退出man帮助
+
+
+### 根据关键字搜索 man
+
+使⽤ man 命令 -k 选项可在 man page 的标题和描述中搜索关键字
+
+使⽤ man 命令 -K（⼤写）选项可在全⽂⻚⾯中搜索关键字，⽽不仅仅是在标题和描述中搜索
+
+如果man -k或者man -K不返回结果，可以执行mandb命令执行更新索引
+
+```bash
+[root@host1 ~]# man -k passwd
+chgpasswd (8)        - update group passwords in batch mode
+chpasswd (8)         - update passwords in batch mode
+fgetpwent_r (3)      - get passwd file entry reentrantly
+getpwent_r (3)       - get passwd file entry reentrantly
+gpasswd (1)          - administer /etc/group and /etc/gshadow
+grub2-mkpasswd-pbkdf2 (1) - Generate a PBKDF2 password hash.
+htpasswd (1)         - Manage user files for basic authentication
+lpasswd (1)          - Change group or user password
+openssl-passwd (1ossl) - compute password hashes
+pam_localuser (8)    - require users to be listed in /etc/passwd
+
+```
+
+# 第五章 创建、查看和编辑⽂本⽂件
+
+## 重定向、追加、管道
+
+### 标准输⼊、标准输出和标准错误
+
+从 shell 提⽰符运⾏命令时，通常会从键盘读取其输⼊，并将输出发送到终端窗⼝。
+
+进程使⽤称为⽂件描述符的编号通道来获取输⼊并发送输出。所有进程在开始时⾄少要有三个⽂件描述符。标准输⼊（通道 0）从键盘读取输⼊。标准输出（通道 1）将正常输出发送到终端。标准错误（通道 2）将错误消息发送到终端。
+
+### 重定向
+
+通过重定向，可以将消息保存到⽂件或直接丢弃，⽽不在终端上显⽰输出
+
+/dev/null是一个特殊设备，所有重定向到这里的内容，将不做保存和处理，直接丢弃
+
+重定向将会清空文件原有内容，并插入新内容，文件不存在时，会创建出来
+
+```bash
+[lixiaohui@host1 ~]$ echo hello
+hello
+[lixiaohui@host1 ~]$ echo hello > file1
+[lixiaohui@host1 ~]$ cat file1
+hello
+[lixiaohui@host1 ~]$ echo hello > /dev/null
+
+```
+
+### 追加
+
+保留原有内容并在后方插入新内容
+
+```bash
+[lixiaohui@host1 ~]$ echo hello line2 >> file1
+[lixiaohui@host1 ~]$ cat file1
+hello
+hello line2
+
+```
+
+### 处理错误输出
+
+shell中的错误，在操作重定向时，将会把错误内容默认输出到屏幕，可以使用`2>`来单独重定向错误信息
+
+```bash
+[lixiaohui@host1 ~]$ ls /home/lixiaohui/ /nolixiaohui > file1
+ls: cannot access '/nolixiaohui': No such file or directory
+[lixiaohui@host1 ~]$ cat file1
+/home/lixiaohui/:
+file1
+glob
+lxhsoft
+lxhtest
+RHEL7
+RHEL8
+RHEL9
+[lixiaohui@host1 ~]$ ls /home/lixiaohui/ /nolixiaohui 2> file1
+/home/lixiaohui/:
+file1  glob  lxhsoft  lxhtest  RHEL7  RHEL8  RHEL9
+[lixiaohui@host1 ~]$ cat file1
+ls: cannot access '/nolixiaohui': No such file or directory
+
+```
+
+### 分别保存正确和错误
+
+```bash
+[lixiaohui@host1 ~]$ ls /home/lixiaohui/ /nolixiaohui > correct.txt 2> error.txt
+[lixiaohui@host1 ~]$ cat correct.txt
+/home/lixiaohui/:
+correct.txt
+error.txt
+file1
+glob
+lxhsoft
+lxhtest
+RHEL7
+RHEL8
+RHEL9
+[lixiaohui@host1 ~]$ cat error.txt
+ls: cannot access '/nolixiaohui': No such file or directory
+
+```
+
+### 正确和错误合并处理
+
+```bash
+[lixiaohui@host1 ~]$ ls /home/lixiaohui/ /nolixiaohui
+ls: cannot access '/nolixiaohui': No such file or directory
+/home/lixiaohui/:
+file1  glob  lxhsoft  lxhtest  RHEL7  RHEL8  RHEL9
+[lixiaohui@host1 ~]$
+[lixiaohui@host1 ~]$ ls /home/lixiaohui/ /nolixiaohui > correct.txt
+ls: cannot access '/nolixiaohui': No such file or directory
+[lixiaohui@host1 ~]$ cat correct.txt
+/home/lixiaohui/:
+correct.txt
+file1
+glob
+lxhsoft
+lxhtest
+RHEL7
+RHEL8
+RHEL9
+[lixiaohui@host1 ~]$ ls /home/lixiaohui/ /nolixiaohui 2> correct.txt
+/home/lixiaohui/:
+correct.txt  file1  glob  lxhsoft  lxhtest  RHEL7  RHEL8  RHEL9
+[lixiaohui@host1 ~]$ cat correct.txt
+ls: cannot access '/nolixiaohui': No such file or directory
+[lixiaohui@host1 ~]$ ls /home/lixiaohui/ /nolixiaohui &> correct.txt
+[lixiaohui@host1 ~]$ cat correct.txt
+ls: cannot access '/nolixiaohui': No such file or directory
+/home/lixiaohui/:
+correct.txt
+file1
+glob
+lxhsoft
+lxhtest
+RHEL7
+RHEL8
+RHEL9
+```
+
+### 构建管道
+
+管道是⼀个或多个命令的序列，⽤竖线字符 (|) 分隔。管道将第⼀个命令的标准输出连接到下⼀个命令的标准输⼊。
+
+计算文件一共有几行
+
+wc -l 需要一系列内容才能计算内容一共有几行，wc 命令所需要的内容由管道将管道前命令的输出提供
+```bash
+[lixiaohui@host1 ~]$ cat /etc/passwd | wc -l
+45
+
+```
+
+### tee 命令
+
+重定向和追加有一个被迫选择的问题，要不输出到屏幕，要不输出到文件，而tee可以做到同时输出到文件和屏幕
+
+```bash
+[lixiaohui@host1 ~]$ echo hello > file1
+[lixiaohui@host1 ~]$ echo hello | tee file1
+hello
+[lixiaohui@host1 ~]$ echo hello world | tee -a file1
+hello world
+[lixiaohui@host1 ~]$ cat file1
+hello
+hello world
+
+```
+
+## 使⽤ Vim 编辑⽂件
+
+Linux上一般都会自带vi命令，而vim是vi的增强版，有语法高亮等高级特性，需要按照`vim-enhanced`软件包，安装好软件包之后，uid 大于 200的用户使用vi命令时，会自动调用vim命令实现高级特性，vi和vim是别名关系
+
+### vim 模式
+
+vim 编辑器有4个模式
+
+1. 命令模式
+
+```bash
+[lixiaohui@host1 ~]$ vim file1 #回车后会进入命令模式
+```
+
+2. 编辑模式
+
+在命令模式中可以输入各种命令，其中包括
+
+> 1. 直接按下小写的`i`，会原地进入编辑模式
+> 2. 编辑完成后按`esc`回到命令模式
+
+3. 扩展命令模式
+
+> 1. 输入`:q!` 可以不保存并退出文件
+> 2. 输入`:wq` 可以保存并退出
+
+4. 可视模式
+
+> 1. 按下`esc`进入命令模式
+> 2. 按下`v` 进入可视模式，按下上下左右键移动
+> 3. 按下`Shift V`可以多行选择，按下上下左右键移动
+> 4. 按下`Ctrl+V`可以做文本块选择，按下上下左右键移动
+
+### vim 基本命令
+
+
+```bash
+[lixiaohui@host1 ~]$ cp /etc/passwd /tmp/passwd
+[lixiaohui@host1 ~]$ vim /tmp/passwd
+```
+
+先进入到具体有内容的文件中，执行以下命令：
+
+
+1. `yy` 复制光标所在行
+2. `p` 在光标所在行下方插入刚复制的内容
+3. `x` 删除光标所在的单个字符
+4. `dd` 删除光标所在行
+5. `3dd` 删除包括光标所在行的向下3行
+6. `3,5y` 复制第3到第5行
+7. `3,5d` 删除第3到第5行
+8. `/lixiaohui` 快速搜索lixiaohui字符串
+9. `n`或`N`，搜索到之后，向下或向上查找
+10. `u` 撤销你刚才修改的内容
+11. `ctrl r` 撤销你刚才撤销的动作，也就是说把刚才撤销的东西再找回来
+12. `:w` 只保存不退出
+13. `:q!` 只退出不保存
+14. `set nu` 显示行号
+15. `set nonu` 取消行号显示
+
+## 更改 Shell 环境
+
+变量名称可以包含⼤写或⼩写字⺟、数字和下划线字符 (_)，但是不要数字开头
+
+变量赋值与取消
+
+```bash
+[lixiaohui@host1 ~]$ username=lixiaohui
+[lixiaohui@host1 ~]$ unset username
+
+```
+
+列出所有常规变量
+
+```bash
+[lixiaohui@host1 ~]$ set
+BASH=/bin/bash
+BASHOPTS=checkwinsize:cmdhist:complete_fullquote:expand_aliases:extglob:extquote:force_fignore:globasciiranges:histappend:interactive_comments:login_shell:progcomp:p
+romptvars:sourcepath
+BASHRCSOURCED=Y
+BASH_ALIASES=()
+
+```
+将变量导出为环境变量以便于所有的shell会话都可以访问
+
+```bash
+[lixiaohui@host1 ~]$ username=lixiaohui
+[lixiaohui@host1 ~]$ echo $username
+lixiaohui
+[lixiaohui@host1 ~]$ bash
+[lixiaohui@host1 ~]$ echo $username
+
+[lixiaohui@host1 ~]$ username=lixiaohui
+[lixiaohui@host1 ~]$ export username=lixiaohui
+[lixiaohui@host1 ~]$ bash
+[lixiaohui@host1 ~]$ echo $username
+lixiaohui
+
+```
+
+列出所有环境变量
+
+```bash
+[lixiaohui@host1 ~]$ env
+```
+
+**自动设置变量**
+
+用等于号设置变量的方法在会话断开重连之后会失效，可以考虑放入文件中做持久化，/etc中的文件影响整个系统
+
+1. /etc/profile
+2. ~/.bash_profile
+3. /etc/bashrc
+4. ~/.bashrc
+
+若要调整作⽤于所有⽤⼾帐⼾的设置，最佳⽅式是带有 .sh 扩展名的⽂件，并放入/etc/profile.d ⽬录
+
+**Bash 别名**
+
+将别名添加到⽤⼾的 ~/.bashrc ⽂件中，以便它们在任何交互式 shell 中可⽤。
+
+```bash
+[lixiaohui@host1 ~]$ alias lxh='echo lixiaohui'
+[lixiaohui@host1 ~]$ lxh
+lixiaohui
+
+```
+取消别名
+
+```bash
+[lixiaohui@host1 ~]$ alias lxh='echo lixiaohui'
+[lixiaohui@host1 ~]$ lxh
+lixiaohui
+[lixiaohui@host1 ~]$ unalias lxh
+[lixiaohui@host1 ~]$ lxh
+bash: lxh: command not found...
+
+```
