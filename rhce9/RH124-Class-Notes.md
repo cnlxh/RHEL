@@ -1319,7 +1319,7 @@ su的命令要求你必须输入对方的密码，这是很不方便的，尤其
 
 **su、su - 和 sudo 命令之间的区别**
 
-![su-su--sudo](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/rh124/su-su--sudo.png)
+![su-su--sudo](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/rh124/su-su-sudo.png)
 
 普通用户不具有用户创建权限
 
