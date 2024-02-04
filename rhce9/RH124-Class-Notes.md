@@ -1173,3 +1173,215 @@ lixiaohui
 bash: lxh: command not found...
 
 ```
+
+# 第六章 管理本地⽤⼾和组
+
+## 用户类型
+
+1. 超级⽤⼾
+
+超级⽤⼾的名称为 root，其帐⼾的 UID 为 0，拥有所有权限
+
+2. 系统⽤⼾
+
+系统⽤⼾帐⼾供提供⽀持服务进程使⽤，一般不具有特权，⽤⼾⽆法使⽤系统⽤⼾帐⼾以交互⽅式登录
+
+3. 普通⽤⼾
+
+⼤多数⽤⼾都有⽤于处理⽇常⼯作的普通⽤⼾帐⼾，也不具有特权
+
+文件和进程都属于某一用户，用来配合权限工作
+
+```bash
+[lixiaohui@host1 ~]$ id root
+uid=0(root) gid=0(root) groups=0(root)
+[lixiaohui@host1 ~]$ id lixiaohui
+uid=1001(lixiaohui) gid=1001(lixiaohui) groups=1001(lixiaohui)
+[lixiaohui@host1 ~]$
+[lixiaohui@host1 ~]$ ll /readme.txt
+-rw-r--r--. 1 root root 105 Nov 10 05:33 /readme.txt
+
+[lixiaohui@host1 ~]$ ps aux | more
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  1.2  0.1 172312 16612 ?        Ss   00:52   0:01 /usr/lib/systemd/systemd rhgb
+root           2  0.0  0.0      0     0 ?        S    00:52   0:00 [kthreadd]
+root           3  0.0  0.0      0     0 ?        I<   00:52   0:00 [rcu_gp]
+root           4  0.0  0.0      0     0 ?        I<   00:52   0:00 [rcu_par_gp]
+
+```
+
+## 用户文件/etc/passwd
+
+系统使⽤ /etc/passwd ⽂件存储有关本地⽤⼾的信息，该⽂件划分为七个以冒号分隔的字段
+
+```bash
+[lixiaohui@host1 ~]$ cat /etc/passwd
+lixiaohui:x:1001:1001:Lxh:/home/lixiaohui:/bin/bash
+```
+
+- `lixiaohui` ：此⽤⼾的⽤⼾名。
+- `x` ：⽤⼾的加密密码历来存储在这⾥，这现在是⼀个占位符。
+- `1001` ：此⽤⼾帐⼾的 UID 编号。
+- `1001` ：此⽤⼾帐⼾的主要组的 GID 编号。
+- `Lxh` ：此⽤⼾的简短注释、描述或真实姓名。
+- `/home/lixiaohui` ：⽤⼾的主⽬录，以及登录 shell 启动时的初始⼯作⽬录。
+- `/bin/bash` ：此⽤⼾的默认 shell 程序，在登录时运⾏。⼀些帐⼾使⽤ /sbin/nologin shell
+来禁⽌使⽤该帐⼾进⾏交互式登录。
+
+## 组文件/etc/group
+
+系统使⽤ /etc/group ⽂件存储有关本地组的信息，每个组条⽬被分为四个以冒号分隔的字段
+
+```bash
+[lixiaohui@host1 ~]$ cat /etc/group
+lixiaohui:x:1001::user01,user02,user03
+```
+
+- `lixiaohui` ：此组的名称。
+- `x` ：以前的组密码字段，现在是⼀个占位符。
+- `10000` ：此组的 GID 编号 (1001)。
+- `user01,user02,user03` ：属于此组成员的⽤⼾列表，作为⼀个补充组
+
+## 主要组和补充组
+
+**主要组**
+
+每个⽤⼾有且`只有⼀个主要组`，在创建普通⽤⼾时，会创建⼀个`与⽤⼾同名的组`，作为该⽤⼾的主要组，该⽤⼾是这个`⽤⼾私有组`的唯⼀成员
+
+```text
+我入职了IT部门，我的主要职责是IT服务，lixiaohui用户在Linux上被创建的时候会同步创建lixiaohui的组，所以我的主要组或私有组是lixiaohui
+```
+
+**补充组**
+
+补充组中的成员资格存储在 /etc/group ⽂件中。根据所在的组是否具有访问权限，将授予⽤⼾对⽂件的访问权限，不论这些组是主要组还是补充组
+
+```text
+我是IT部的人，所以我同时属于我的私有组lixiaohui，也属于IT部门，还属于公司全员
+```
+
+此时权限的分配变得简单，只需要分配到IT部门，我就会获得权限
+
+## 获取超级用户访问权限
+
+Linux 上的 root 帐⼾类似于 Microsoft Windows 上的本地 Administrator 帐⼾，。⼀旦 root ⽤⼾帐⼾被盗，系统将处于危险之中，所以我们不给用户超级用户权限，但是有时候一部分特权工作需要用户完成，例如HR需要执行useradd创建用户，此时HR将会用到下方的切换用户的方法
+
+### su 直接切换身份
+
+使用su - USERNAME的方法切换到目标用户身份下，普通用户的切换需要提供目标密码，而root用户切换无需密码
+
+如果su后面省略⽤⼾名，则默认情况下会尝试切换到 root
+
+```bash
+[lixiaohui@host1 ~]$ su - lxh
+Password:
+[root@foundation0 ~]# su - lxh
+Last login: Mon Feb  5 01:12:31 CST 2024 on pts/0
+[lxh@host1 ~]$ su - root
+Password:
+Last login: Mon Feb  5 00:53:52 CST 2024 from 172.25.254.1 on pts/0
+
+```
+
+### su 与 su -
+
+su命令后面也可以不写中横杠，区别如下：
+
+1. su 命令将启动⾮登录 shell，su 以该⽤⼾⾝份启动shell，但使⽤的是原始⽤⼾的环境设置
+
+2. su - 命令会启动登录 shell，会将 shell 环境设置为如同以该⽤⼾⾝份重新登录⼀样
+
+一般来说，管理员应该运⾏ su - 以获得包含⽬标⽤⼾常规环境设置的 shell
+
+```bash
+[lxh@host1 ~]$ su root
+Password:
+[root@host1 lxh]# ls
+[root@host1 lxh]# pwd
+/home/lxh
+[root@host1 lxh]# exit
+exit
+
+[lxh@host1 ~]$ su - root
+Password:
+Last login: Mon Feb  5 01:18:34 CST 2024 on pts/0
+[root@host1 ~]# pwd
+/root
+[root@host1 ~]# ls
+anaconda-ks.cfg
+```
+
+### 通过sudo 获得权限
+
+su的命令要求你必须输入对方的密码，这是很不方便的，尤其是root密码不应该轻易共享，此时sudo就可以派上用场了
+
+与 su 命令不同，sudo 通常要求⽤⼾输⼊⾃⼰的密码以进⾏⾝份验证，⽽不是输⼊他们正尝试访问的⽤⼾帐⼾的密码。也就是说，⽤⼾使⽤ sudo 命令以 root ⾝份运⾏命令时，不需要知道 root 密码。
+
+**su、su - 和 sudo 命令之间的区别**
+
+![su-su--sudo](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/rh124/su-su--sudo.png)
+
+普通用户不具有用户创建权限
+
+```bash
+[lixiaohui@host1 ~]$ useradd zhangsan
+useradd: Permission denied.
+useradd: cannot lock /etc/passwd; try again later.
+
+```
+
+用root权限，授予lixiaohui用户可以创建用户和删除用户权限
+
+先查询用户创建和删除的命令位置
+
+```bash
+[root@foundation0 ~]# which useradd
+/usr/sbin/useradd
+[root@foundation0 ~]# which userdel
+/usr/sbin/userdel
+
+```
+
+**sudo 授权**
+
+以下授权允许lixiaohui用户可以sudo运行useradd和userdel命令，但是不允许用sudo的方式运行ls命令
+```bash
+[root@foundation0 ~]# vim /etc/sudoers
+[root@foundation0 ~]# tail -n 1 /etc/sudoers
+lixiaohui    ALL=(ALL)       /usr/sbin/useradd,/usr/sbin/userdel,!/bin/ls
+
+```
+
+以下授权允许lixiaohui用户可以sudo运行所有命令，且不需要密码
+
+```bash
+[root@foundation0 ~]# vim /etc/sudoers
+[root@foundation0 ~]# tail -n 1 /etc/sudoers
+lixiaohui       ALL=(ALL)       NOPASSWD: ALL
+
+```
+我们注意，在userdel时失败了一次，因为没有sudo命令开始，不经过我们的授权验证
+
+```bash
+[root@foundation0 ~]# su - lixiaohui
+Last login: Mon Feb  5 01:25:52 CST 2024 on pts/0
+[lixiaohui@host1 ~]$ sudo useradd zhangsan
+...
+[sudo] password for lixiaohui:
+
+[lixiaohui@host1 ~]$ tail -n 1 /etc/passwd
+zhangsan:x:1003:1003::/home/zhangsan:/bin/bash
+
+[lixiaohui@host1 ~]$ userdel -r zhangsan
+userdel: Permission denied.
+userdel: cannot lock /etc/passwd; try again later.
+
+[lixiaohui@host1 ~]$ sudo userdel -r zhangsan
+[lixiaohui@host1 ~]$ tail -n 1 /etc/passwd
+lxh:x:1002:1002::/home/lxh:/bin/bash
+
+[lixiaohui@host1 ~]$ sudo ls
+Sorry, user lixiaohui is not allowed to execute '/bin/ls' as root on host1.
+
+```
+
