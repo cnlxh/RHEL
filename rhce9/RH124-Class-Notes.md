@@ -1587,3 +1587,362 @@ salt 添加随机数据到加密哈希，以创建唯⼀哈希来增强加密哈
 [root@host1 ~]#  chage -d 0 lixiaohui
 ```
 
+# 控制对⽂件的访问
+
+## Linux ⽂件系统权限概述
+
+⽂件具有三个应⽤权限的⽤⼾类别。⽂件归某个⽤⼾所有，通常是⽂件的创建者。⽂件还归单个组所有，通常是创建该⽂件的⽤⼾的主要组，但是可以进⾏更改。
+
+权限承载的主体有：
+
+1. 所属⽤⼾（⽤⼾权限）
+
+2. 所属组（组权限）系统上
+
+3. ⾮所属⽤⼾和⾮所属组成员的所有其他⽤⼾（其他权限）
+
+**最具体的权限具有优先权。用户权限覆盖组权限，后者⼜覆盖其他权限**
+
+## 权限对⽂件和⽬录的影响
+
+![permission-rwx](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/rh124/permission-rwx.png)
+
+## 查看权限
+
+看出不管是文件还是目录，都归当前用户以及当前用户组所有
+
+```bash
+[lixiaohui@host1 ~]$ touch lxhfile
+[lixiaohui@host1 ~]$ mkdir lxhfolder
+[lixiaohui@host1 ~]$ ll
+total 0
+-rw-r--r--. 1 lixiaohui lixiaohui 0 Feb  5 23:49 lxhfile
+drwxr-xr-x. 2 lixiaohui lixiaohui 6 Feb  5 23:49 lxhfolder
+
+```
+
+**文件类型**
+
+ll 命令是ls -l的缩写，以下命令输出中第一个字母d代表这次的输出是文件夹
+
+```bash
+[lixiaohui@host1 ~]$ ll -d lxhfolder
+drwxr-xr-x. 2 lixiaohui lixiaohui 6 Feb  5 23:49 lxhfolder
+
+```
+
+第一个字母还可以是以下的字母：
+
+- `-`  是常规⽂件。
+- `d`  是⽬录。
+- `l`  是符号链接。
+- `c`  是字符设备⽂件。
+- `b`  是块设备⽂件。
+- `p`  是命名管道⽂件。
+- `s`  是本地套接字⽂件
+
+**权限解释**
+
+九个字符代表⽂件权限。这些字符解释为三组，每组三个字符：第⼀组是适⽤于⽂件所有者的权限，第⼆组⽤于⽂件的组所有者，最后⼀组则适⽤于所有其他（全局）⽤⼾
+
+```bash
+[lixiaohui@host1 ~]$ ll -d lxhfolder
+drwxr-xr-x. 2 lixiaohui lixiaohui 6 Feb  5 23:49 lxhfolder
+
+```
+
+1. `d` ，代表文件类型
+2. `rwx`，第一组三位字符是指此文件所属用户的权限为读、写、执行
+3. `r-x`，第二组三位字符是指此文件所属组的权限为读、执行
+4. `r-x`，第三组三位字符是指非所属用户和所属组的其他所有人的权限为读、执行
+5. `.`，这代表常规已经显示完毕，如果写的是`+`，代表还有额外的acl权限
+6. `2`，这代表文件的链接数量，每个目录的链接数最起码是2，指向自身(.)或上级(..)
+7. `lixiaohui`，第一个`lixiaohui`是指此文件夹被`lixiaohui用户`所拥有
+8. `lixiaohui`，第二个`lixiaohui`是指此文件夹被`lixiaohui组`所拥有
+
+## 更改⽂件和⽬录权限
+
+
+### 通过符号法更改权限
+chmod 命令具有以下特性：可从命令⾏更改⽂件和⽬录权限。这可以解释为“更改模式”，因为⽂件的模式是⽂件权限的另⼀个名称
+
+使⽤ chmod 命令修改⽂件和⽬录权限的格式如下：
+
+```bash
+chmod Who/What/Which file|directory
+```
+
+who 代表用户主体，可以是：
+
+|who|主体|
+|-|-|
+|u|user|
+|g|group|
+|o|other|
+|a|all|
+
+what 代表从文件身上添加还是删除权限
+
+|what|操作|
+|-|-|
+|+|添加|
+|-|删除|
+|=|等于|
+
+which 代表具体的权限
+
+|which|权限或模式|备注|
+|-|-|-|
+|r|读|-|
+|w|写|-|
+|x|执行|对于目录而言，必须要有x权限，不然无法进入|
+|X|特殊的执行权限|仅仅给这个目录添加执行权限，而不影响下级文件的执行权限|
+
+
+```bash
+[lixiaohui@host1 ~]$ ll -d lxhfolder
+drwxr-xr-x. 2 lixiaohui lixiaohui 6 Feb  5 23:49 lxhfolder
+[lixiaohui@host1 ~]$ chmod go-rw lxhfile
+[lixiaohui@host1 ~]$ ll lxhfile
+-rw-------. 1 lixiaohui lixiaohui 0 Feb  5 23:49 lxhfile
+[lixiaohui@host1 ~]$ chmod a+x lxhfile
+[lixiaohui@host1 ~]$ ll lxhfile
+-rwx--x--x. 1 lixiaohui lixiaohui 0 Feb  5 23:49 lxhfile
+[lixiaohui@host1 ~]$ chmod a=rw lxhfile
+[lixiaohui@host1 ~]$ ll lxhfile
+-rw-rw-rw-. 1 lixiaohui lixiaohui 0 Feb  5 23:49 lxhfile
+
+```
+
+可以使⽤ chmod 命令 -R 选项，以递归⽅式对整个⽬录树中的⽂件设置权限
+
+```bash
+[root@host1 ~]# mkdir folder1
+[root@host1 ~]# touch folder1/file{1..10}
+[root@host1 ~]# ll folder1
+total 0
+-rw-r--r--. 1 root root 0 Feb  6 00:15 file1
+-rw-r--r--. 1 root root 0 Feb  6 00:15 file10
+-rw-r--r--. 1 root root 0 Feb  6 00:15 file2
+-rw-r--r--. 1 root root 0 Feb  6 00:15 file3
+-rw-r--r--. 1 root root 0 Feb  6 00:15 file4
+-rw-r--r--. 1 root root 0 Feb  6 00:15 file5
+-rw-r--r--. 1 root root 0 Feb  6 00:15 file6
+-rw-r--r--. 1 root root 0 Feb  6 00:15 file7
+-rw-r--r--. 1 root root 0 Feb  6 00:15 file8
+-rw-r--r--. 1 root root 0 Feb  6 00:15 file9
+[root@host1 ~]# chmod -R a+wx folder1
+[root@host1 ~]# ll folder1
+total 0
+-rwxrwxrwx. 1 root root 0 Feb  6 00:15 file1
+-rwxrwxrwx. 1 root root 0 Feb  6 00:15 file10
+-rwxrwxrwx. 1 root root 0 Feb  6 00:15 file2
+-rwxrwxrwx. 1 root root 0 Feb  6 00:15 file3
+-rwxrwxrwx. 1 root root 0 Feb  6 00:15 file4
+-rwxrwxrwx. 1 root root 0 Feb  6 00:15 file5
+-rwxrwxrwx. 1 root root 0 Feb  6 00:15 file6
+-rwxrwxrwx. 1 root root 0 Feb  6 00:15 file7
+-rwxrwxrwx. 1 root root 0 Feb  6 00:15 file8
+-rwxrwxrwx. 1 root root 0 Feb  6 00:15 file9
+
+```
+
+### 通过⼋进制法更改权限
+
+可以使⽤ chmod 命令，通过⼋进制法（⽽⾮符号法）来更改⽂件权限，具体格式：
+
+```text
+chmod ### file|directory
+```
+
+以上的三个#号是数字，每个数字分别代表用户、组、其他人，单个⼋进制数字可以表⽰ 0-7 的任何单个值，7代表最高所有权限都有
+
+- `0`，没有权限
+- `1`，执行权限
+- `2`，写入权限
+- `3`，写入和执行(1+2)
+- `4`，读取权限
+- `5`，执行和读取(1+4)
+- `6`，写入和读取(2+4)
+- `7`，写入和读取和执行(1+2+4)
+
+```bash
+[lixiaohui@host1 ~]$ ll
+total 0
+-rw-rw-rw-. 1 lixiaohui lixiaohui   0 Feb  5 23:49 lxhfile
+drw-rw-rw-. 2 lixiaohui lixiaohui 137 Feb  6 00:12 lxhfolder
+[lixiaohui@host1 ~]$ chmod 123 lxhfile
+[lixiaohui@host1 ~]$ ll lxhfile
+---x-w--wx. 1 lixiaohui lixiaohui 0 Feb  5 23:49 lxhfile
+[lixiaohui@host1 ~]$ chmod 456 lxhfile
+[lixiaohui@host1 ~]$ ll lxhfile
+-r--r-xrw-. 1 lixiaohui lixiaohui 0 Feb  5 23:49 lxhfile
+[lixiaohui@host1 ~]$ chmod 777 lxhfile
+[lixiaohui@host1 ~]$ ll lxhfile
+-rwxrwxrwx. 1 lixiaohui lixiaohui 0 Feb  5 23:49 lxhfile
+
+```
+
+## 更改文件或目录所有权
+
+⽤⼾以及用户的私有组拥有其创建的⽂件，但是也可以用chown或chgrp来更改，这两个命令都可以用-R参数对文件夹进行递归修改，也就是对文件夹里的文件同步生效的意思
+
+**只更改文件的拥有人**
+
+将lxhfile2的拥有人改为laoli
+
+```bash
+[root@host1 ~]# touch lxhfile2
+[root@host1 ~]# ll lxhfile2
+-rw-r--r--. 1 root root 0 Feb  6 00:24 lxhfile2
+[root@host1 ~]# chown laoli lxhfile2
+[root@host1 ~]# ll lxhfile2
+-rw-r--r--. 1 laoli root 0 Feb  6 00:24 lxhfile2
+
+```
+
+**只更改文件的所属组**
+
+```bash
+[root@host1 ~]# chown :lixiaohui lxhfile2
+[root@host1 ~]# ll lxhfile2
+-rw-r--r--. 1 laoli lixiaohui 0 Feb  6 00:24 lxhfile2
+
+[root@host1 ~]# ll lxhfile2
+-rw-r--r--. 1 laoli lixiaohui 0 Feb  6 00:24 lxhfile2
+[root@host1 ~]#
+[root@host1 ~]# chgrp root lxhfile2
+[root@host1 ~]# ll lxhfile2
+-rw-r--r--. 1 laoli root 0 Feb  6 00:24 lxhfile2
+
+```
+
+**同时更改文件的拥有人和所属组**
+
+```bash
+[root@host1 ~]# ll lxhfile2
+-rw-r--r--. 1 laoli root 0 Feb  6 00:24 lxhfile2
+[root@host1 ~]# chown lixiaohui:group1 lxhfile2
+[root@host1 ~]# ll lxhfile2
+-rw-r--r--. 1 lixiaohui group1 0 Feb  6 00:24 lxhfile2
+
+```
+
+## 管理默认权限和文件访问
+
+### 特殊权限
+
+特殊权限是除了⽤⼾、组和其他类型之外的第四种权限类型，所有的特殊权限都要求相应的权限主体有执行权限，如果没有执行权限，所有的特殊权限都会以大写的方式警告此权限无法生效
+
+1. suid，chmod中的数字修改法中，用4表示
+2. sgid，chmod中的数字修改法中，用2表示
+3. sticky，，chmod中的数字修改法中，用1表示
+
+```bash
+[root@host1 ~]# chmod 1777 folder
+```
+
+|权限|对文件的影响|对⽬录的影响|
+|-|-|-|
+|u+s (suid)|以拥有⽂件的⽤⼾⾝份，⽽不是以运⾏⽂件的⽤⼾⾝份执⾏⽂件|⽆影响|
+|g+s (sgid)|以拥有⽂件的组⾝份执⾏⽂件|⽬录中创建的⽂件的组所有者与⽬录的组所有者相匹配|
+|o+t (sticky)|⽆影响|对⽬录具有写⼊访问权限的⽤⼾仅可以删除其所拥有的⽂件，⽽⽆法删除或强制保存到其他⽤⼾所拥有的⽂件|
+
+**SUID**
+
+这出现在程序或脚本场景中，不管谁执行程序，都以程序文件所属的用户身份和权限执行，而不是执行人的身份和权限
+
+我们发现所有人对密码文件都没有修改权限，而root由于是特殊的超级管理员，只有root用户可以修改
+
+```bash
+[root@host1 ~]# ll /etc/shadow
+----------. 1 root root 1433 Feb  6 00:23 /etc/shadow
+
+```
+/bin/passwd是用来改密码的，此程序已经被执行了`chmod u+s /bin/passwd`，所以用户权限上有一个小写的s，这就意味着所有人执行/bin/passwd时，都以root用户身份和权限修改/etc/shadow，所以才能改密码
+
+```bash
+[root@host1 ~]# ll /bin/passwd
+-rwsr-xr-x. 1 root root 32648 Aug 10  2021 /bin/passwd
+
+```
+
+**SGID**
+
+这出现在文件夹的场景下，我们要求不管谁向特定的文件夹写入文件，新产生的文件要自动归属于特定的组拥有，例如root用户写的代码必须自动归属于group1这个组
+
+```bash
+[root@host1 ~]# mkdir /lxh-sgid-folder
+[root@host1 ~]# ll -d /lxh-sgid-folder
+drwxr-xr-x. 2 root root 6 Feb  6 00:37 /lxh-sgid-folder
+[root@host1 ~]# chmod a+w /lxh-sgid-folder
+[root@host1 ~]# ll -d /lxh-sgid-folder
+drwxrwxrwx. 2 root root 6 Feb  6 00:37 /lxh-sgid-folder
+[root@host1 ~]# chgrp group1 /lxh-sgid-folder
+[root@host1 ~]# ll -d /lxh-sgid-folder
+drwxrwxrwx. 2 root group1 6 Feb  6 00:37 /lxh-sgid-folder
+
+[root@host1 ~]# chmod g+s /lxh-sgid-folder/
+[root@host1 ~]# ll -d /lxh-sgid-folder/
+drwxrwsrwx. 2 root group1 6 Feb  6 00:38 /lxh-sgid-folder/
+[root@host1 ~]# touch /lxh-sgid-folder/rootwrite
+[root@host1 ~]# ll /lxh-sgid-folder/rootwrite
+-rw-r--r--. 1 root group1 0 Feb  6 00:38 /lxh-sgid-folder/rootwrite
+
+```
+
+**sticky 权限**
+
+这出现在公共目录使用场景，要求人们只能管理和删除自己的文件，删除别人的文件会报告`Operation not permitted`
+
+```bash
+[root@host1 ~]# mkdir /lxh-sticky
+[root@host1 ~]# chmod 777 /lxh-sticky
+[root@host1 ~]# ll -d /lxh-sticky
+drwxrwxrwx. 2 root root 6 Feb  6 00:44 /lxh-sticky
+[root@host1 ~]# chmod o+t /lxh-sticky
+[root@host1 ~]# ll -d /lxh-sticky
+drwxrwxrwt. 2 root root 6 Feb  6 00:44 /lxh-sticky
+[root@host1 ~]# touch /lxh-sticky/rootfile
+[root@host1 ~]# su - lixiaohui
+Last login: Tue Feb  6 00:23:40 CST 2024 on pts/0
+[lixiaohui@host1 ~]$ touch /lxh-sticky/lixiaohuifile
+[lixiaohui@host1 ~]$ ll /lxh-sticky/
+total 0
+-rw-r--r--. 1 lixiaohui lixiaohui 0 Feb  6 00:45 lixiaohuifile
+-rw-r--r--. 1 root      root      0 Feb  6 00:44 rootfile
+[lixiaohui@host1 ~]$ rm -rf /lxh-sticky/*
+rm: cannot remove '/lxh-sticky/rootfile': Operation not permitted
+[lixiaohui@host1 ~]$ ll /lxh-sticky/
+total 0
+-rw-r--r--. 1 root root 0 Feb  6 00:44 rootfile
+
+```
+
+## 默认⽂件权限
+
+在创建时，⽂件被分配初始权限。有两个因素会影响这些初始权限。其⼀是您要创建常规⽂件还是⽬录。其⼆是当前的 umask，它代表⽤⼾⽂件创建掩码
+
+如果创建⽬录，则其初始⼋进制权限为 0777 (drwxrwxrwx)。如果您创建常规⽂件，则其初始⼋进制权限为 0666 (-rw-rw-rw-)，umask是从以上权限数字中，减去特定的数字，最终得到权限
+
+如果umask是0022，那么文件夹默认权限是0755，文件权限是0644
+
+```bash
+[root@host1 ~]# umask
+0022
+[root@host1 ~]# umask -p
+umask 0022
+[root@host1 ~]# umask -S
+u=rwx,g=rx,o=rx
+[root@host1 ~]# mkdir foldertest
+[root@host1 ~]# touch filetest
+[root@host1 ~]# ll -d foldertest/ filetest
+-rw-r--r--. 1 root root 0 Feb  6 00:49 filetest
+drwxr-xr-x. 2 root root 6 Feb  6 00:49 foldertest/
+
+```
+
+**修改umask值**
+
+你可以在命令行中输入umask xxxx回车，但是这只有临时生效，你可以放入家目录中的`.bashrc`只影响自己一个人，也可以把`umask xxxx`这个内容放入`/etc/bashrc或/etc/profile`影响整个系统
+
