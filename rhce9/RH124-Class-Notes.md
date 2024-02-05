@@ -1178,15 +1178,15 @@ bash: lxh: command not found...
 
 ## 用户类型
 
-1. 超级⽤⼾
+1. **超级⽤⼾**
 
 超级⽤⼾的名称为 root，其帐⼾的 UID 为 0，拥有所有权限
 
-2. 系统⽤⼾
+2. **系统⽤⼾**
 
 系统⽤⼾帐⼾供提供⽀持服务进程使⽤，一般不具有特权，⽤⼾⽆法使⽤系统⽤⼾帐⼾以交互⽅式登录
 
-3. 普通⽤⼾
+3. **普通⽤⼾**
 
 ⼤多数⽤⼾都有⽤于处理⽇常⼯作的普通⽤⼾帐⼾，也不具有特权
 
@@ -1212,7 +1212,7 @@ root           4  0.0  0.0      0     0 ?        I<   00:52   0:00 [rcu_par_gp]
 
 ## 用户文件/etc/passwd
 
-系统使⽤ /etc/passwd ⽂件存储有关本地⽤⼾的信息，该⽂件划分为七个以冒号分隔的字段
+系统使⽤ `/etc/passwd` ⽂件存储有关本地⽤⼾的信息，该⽂件划分为七个以冒号分隔的字段
 
 ```bash
 [lixiaohui@host1 ~]$ cat /etc/passwd
@@ -1230,7 +1230,7 @@ lixiaohui:x:1001:1001:Lxh:/home/lixiaohui:/bin/bash
 
 ## 组文件/etc/group
 
-系统使⽤ /etc/group ⽂件存储有关本地组的信息，每个组条⽬被分为四个以冒号分隔的字段
+系统使⽤ `/etc/group` ⽂件存储有关本地组的信息，每个组条⽬被分为四个以冒号分隔的字段
 
 ```bash
 [lixiaohui@host1 ~]$ cat /etc/group
@@ -1254,7 +1254,7 @@ lixiaohui:x:1001::user01,user02,user03
 
 **补充组**
 
-补充组中的成员资格存储在 /etc/group ⽂件中。根据所在的组是否具有访问权限，将授予⽤⼾对⽂件的访问权限，不论这些组是主要组还是补充组
+补充组中的成员资格存储在 `/etc/group` ⽂件中。根据所在的组是否具有访问权限，将授予⽤⼾对⽂件的访问权限，不论这些组是主要组还是补充组
 
 ```text
 我是IT部的人，所以我同时属于我的私有组lixiaohui，也属于IT部门，还属于公司全员
@@ -1264,18 +1264,18 @@ lixiaohui:x:1001::user01,user02,user03
 
 ## 获取超级用户访问权限
 
-Linux 上的 root 帐⼾类似于 Microsoft Windows 上的本地 Administrator 帐⼾，。⼀旦 root ⽤⼾帐⼾被盗，系统将处于危险之中，所以我们不给用户超级用户权限，但是有时候一部分特权工作需要用户完成，例如HR需要执行useradd创建用户，此时HR将会用到下方的切换用户的方法
+Linux 上的 `root 帐⼾`类似于 Microsoft Windows 上的本地 `Administrator` 帐⼾，。⼀旦 root ⽤⼾帐⼾被盗，系统将处于危险之中，所以我们不给用户超级用户权限，但是有时候一部分特权工作需要用户完成，例如HR需要执行useradd创建用户，此时HR将会用到下方的切换用户的方法
 
 ### su 直接切换身份
 
-使用su - USERNAME的方法切换到目标用户身份下，普通用户的切换需要提供目标密码，而root用户切换无需密码
+使用su - USERNAME的方法切换到目标用户身份下，普通用户的切换需要提供目标密码，而root用户切换到其他用户时无需密码
 
 如果su后面省略⽤⼾名，则默认情况下会尝试切换到 root
 
 ```bash
 [lixiaohui@host1 ~]$ su - lxh
 Password:
-[root@foundation0 ~]# su - lxh
+[root@host1 ~]# su - lxh
 Last login: Mon Feb  5 01:12:31 CST 2024 on pts/0
 [lxh@host1 ~]$ su - root
 Password:
@@ -1317,6 +1317,8 @@ su的命令要求你必须输入对方的密码，这是很不方便的，尤其
 
 与 su 命令不同，sudo 通常要求⽤⼾输⼊⾃⼰的密码以进⾏⾝份验证，⽽不是输⼊他们正尝试访问的⽤⼾帐⼾的密码。也就是说，⽤⼾使⽤ sudo 命令以 root ⾝份运⾏命令时，不需要知道 root 密码。
 
+**需要注意的是，系统默认授予了wheel组可以用sudo运行所有命令的权限**
+
 **su、su - 和 sudo 命令之间的区别**
 
 ![su-su--sudo](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/rh124/su-su-sudo.png)
@@ -1330,40 +1332,58 @@ useradd: cannot lock /etc/passwd; try again later.
 
 ```
 
-用root权限，授予lixiaohui用户可以创建用户和删除用户权限
+用root权限，授予`lixiaohui用户`可以创建用户和删除用户权限
 
 先查询用户创建和删除的命令位置
 
 ```bash
-[root@foundation0 ~]# which useradd
+[root@host1 ~]# which useradd
 /usr/sbin/useradd
-[root@foundation0 ~]# which userdel
+[root@host1 ~]# which userdel
 /usr/sbin/userdel
 
 ```
 
 **sudo 授权**
 
-以下授权允许lixiaohui用户可以sudo运行useradd和userdel命令，但是不允许用sudo的方式运行ls命令
+以下授权允许`lixiaohui用户`可以sudo运行useradd和userdel命令，但是不允许用sudo的方式运行ls命令
+
+**手工修改此文件有语法错误的可能性，可以使用 `visudo` 命令去自动打开此文件修改，保存时，会去验证是否正确**
+
+**如果不想修改主配置文件，可以修改`/etc/sudoers.d`路径下的文件，新建一个文件放进来即可**
+
 ```bash
-[root@foundation0 ~]# vim /etc/sudoers
-[root@foundation0 ~]# tail -n 1 /etc/sudoers
+[root@host1 ~]# vim /etc/sudoers
+[root@host1 ~]# tail -n 1 /etc/sudoers
 lixiaohui    ALL=(ALL)       /usr/sbin/useradd,/usr/sbin/userdel,!/bin/ls
 
 ```
 
-以下授权允许lixiaohui用户可以sudo运行所有命令，且不需要密码
+以下授权允许`lixiaohui用户`可以sudo运行所有命令，且`不需要密码`
 
 ```bash
-[root@foundation0 ~]# vim /etc/sudoers
-[root@foundation0 ~]# tail -n 1 /etc/sudoers
+[root@host1 ~]# vim /etc/sudoers
+[root@host1 ~]# tail -n 1 /etc/sudoers
 lixiaohui       ALL=(ALL)       NOPASSWD: ALL
 
 ```
+在配置了允许用户执行所有命令后，用户就可以执行 `sudo -i`来切换到超级用户身份执行命令了
+
+以下授权允许`lxhgroup 组`可以sudo运行所有命令，且不需要密码
+
+```bash
+[root@host1 ~]# vim /etc/sudoers
+[root@host1 ~]# tail -n 1 /etc/sudoers
+@lxhgroup       ALL=(ALL)       NOPASSWD: ALL
+
+```
+
+**测试权限**
+
 我们注意，在userdel时失败了一次，因为没有sudo命令开始，不经过我们的授权验证
 
 ```bash
-[root@foundation0 ~]# su - lixiaohui
+[root@host1 ~]# su - lixiaohui
 Last login: Mon Feb  5 01:25:52 CST 2024 on pts/0
 [lixiaohui@host1 ~]$ sudo useradd zhangsan
 ...
@@ -1383,5 +1403,187 @@ lxh:x:1002:1002::/home/lxh:/bin/bash
 [lixiaohui@host1 ~]$ sudo ls
 Sorry, user lixiaohui is not allowed to execute '/bin/ls' as root on host1.
 
+```
+
+## 管理本地⽤⼾
+
+### 创建⽤⼾
+
+默认会创建用户的家目录，将/bin/bash设置为用户shell，UID和GID从/etc/login.defs中获取，默认创建的第一个用户UID是1000
+
+1. `-u`指定UID
+
+2. `-s`指定shell，其中/sbin/nologin未不允许用户登录，但程序可以本地使用此用户
+
+3. `-G`指定辅助组
+
+4. `-g`执行主要组
+
+```bash
+[root@host1 ~]# useradd lixiaohui
+[root@host1 ~]# grep lixiaohui /etc/passwd
+lixiaohui:x:1001:1001::/home/lixiaohui:/bin/bash
+[root@host1 ~]# ls -d /home/lixiaohui/
+/home/lixiaohui/
+
+[root@host1 ~]# useradd -u 2000 lxh -s /sbin/nologin
+[root@host1 ~]# grep lxh /etc/passwd
+lxh:x:2000:2000::/home/lxh:/sbin/nologin
+[root@host1 ~]# su - lxh
+This account is currently not available.
+
+[root@host1 ~]# useradd -G group1 laoli
+[root@host1 ~]# id laoli
+uid=2001(laoli) gid=2003(laoli) groups=2003(laoli),2001(group1)
+[root@host1 ~]# useradd -g group2 laozhang
+[root@host1 ~]# id laozhang
+uid=2002(laozhang) gid=2002(group2) groups=2002(group2)
+
+```
+
+### 修改用户
+
+`usermod` 可以修改用户信息，其中
+
+1. -a和-G 组合使用可以将用户添加到辅助组，而不从现有组中踢出此用户
+
+只使用-G，会将用户从其他组中踢出
+
+```bash
+[root@host1 ~]# id lixiaohui
+uid=1001(lixiaohui) gid=1001(lixiaohui) groups=1001(lixiaohui),2004(group3)
+[root@host1 ~]# usermod -G group1 lixiaohui
+[root@host1 ~]# id lixiaohui
+uid=1001(lixiaohui) gid=1001(lixiaohui) groups=1001(lixiaohui),2001(group1)
+
+```
+
+组合使用，可以叠加多个组
+
+```bash
+[root@host1 ~]# id lixiaohui
+uid=1001(lixiaohui) gid=1001(lixiaohui) groups=1001(lixiaohui),2001(group1)
+[root@host1 ~]# usermod -aG group2 lixiaohui
+[root@host1 ~]# id lixiaohui
+uid=1001(lixiaohui) gid=1001(lixiaohui) groups=1001(lixiaohui),2001(group1),2002(group2)
+
+```
+
+2. -g 修改用户主要组
+
+```bash
+[root@host1 ~]# usermod -g group2 lixiaohui
+[root@host1 ~]# id lixiaohui
+uid=1001(lixiaohui) gid=2002(group2) groups=2002(group2),2001(group1)
+```
+
+3. 锁定用户不允许登录
+
+```bash
+[root@host1 ~]# usermod -L lixiaohui
+
+```
+
+4. 恢复用户登录
+
+```bash
+[root@host1 ~]# usermod -U lixiaohui
+
+```
+
+5. -s 修改登录的登录shell
+
+/sbin/nolgin和/bin/false都是拒绝用户交互式登录的shell，/sbin/nologin更友好，因为它会提示因为什么拒绝
+
+```bash
+[root@host1 ~]# usermod -s /sbin/nologin lixiaohui
+
+```
+
+### 删除用户
+
+`userdel` 可以删除用户，以下是注意事项：
+
+1. 如果是暂时禁用用户，请使用usermod -L 锁定
+
+2. 如果确定要删除用户，而且不想删除用户的家目录资料，可以执行`userdel USERNAME`
+
+3. 如果确定要删除用户，而且连带用户家目录资料同步删除，可以执行`userdel -r USERNAME`
+
+### 设置用户密码
+
+`passwd`可以给用户设置密码
+
+普通用户不允许在passwd后面加用户名，只能给自己设置，root用户可以在passwd后面加用户名给别人设置密码
+
+```bash
+[root@host1 ~]# passwd lixiaohui
+[lixiaohui@host1 ~]$ passwd laoli
+passwd: Only root can specify a user name.
+
+```
+
+## 管理本地组帐⼾
+
+### 创建本地组
+
+`groupadd `可以创建本地组，默认从/etc/login.defs中获取GID的范围，也可以在创建时指定-g来设置GID，-r 创建系统组
+
+### 修改本地组
+
+`groupmod` 命令可更改现有组的属性。groupmod 命令 -n 选项可指定组的新名称
+
+### 删除本地组
+
+`groupdel` 命令可删除组
+
+## 管理⽤⼾密码
+
+### /etc/shadow
+
+加密后的哈希密码在 `/etc/shadow` ⽂件，只有 root ⽤⼾可以读取该⽂件， /etc/shadow ⽂件中具有九个以冒号分隔的字段：
+
+```bash
+[root@host1 ~]# tail -n 1 /etc/shadow
+lixiaohui:!$6$n.2VAv1m5Y6IL1nN$uYKLCz1acTzn6yyjrCzK5nbuu2viRuLWqZEgrP1QG8YyUICH6rzSg7qgobT.GFTfXUIfYd7FD9rgHslWRal9M1:19758:1:30:7:31:19773:
+
+```
+
+- `lixiaohui` ：⽤⼾帐⼾的名称。
+- `$6$n.2VAv1m5Y6IL1n` ：⽤⼾的加密哈希密码。
+- `19758` ：上次更改密码时间距离纪元的天数；其中，纪元是 UTC 时区的 1970-01-01。
+- `1` ：⾃上次更改密码以来到⽤⼾可再次更改密码之前必须经过的最短天数。
+- `30` ：在密码过期之前不进⾏密码更改的最⻓天数。空字段表⽰密码永不过期。
+- `7` ：在⽤⼾密码过期前提前多少天警告⽤⼾。
+- `31 `：⾃密码过期之⽇起，在帐⼾⾃动锁定之前能够⽆活动的天数。
+- `19773` ：密码到期之⽇距离纪元的天数。空字段表⽰密码永不过期。
+- `最后⼀个字段`通常为空，预留给未来使⽤
+
+### 加密哈希密码的格式
+
+```text
+$6$CSsXcYG1L/4ZfHr/$2W6evvJahUfzfHpc9X.45Jc6H30E
+```
+加密哈希密码字段中存储了三段信息：
+
+1. 所⽤的哈希算法，6 表⽰ SHA-512 哈希，这是 RHEL 9 的默认算法；1 表⽰ MD5，⽽ 5则表⽰ SHA-256
+2. salt，CSsXcYG1L/4ZfHr/
+3. 加密哈希值，2W6evvJahUfzfHpc9X.45Jc6H30E
+
+salt 添加随机数据到加密哈希，以创建唯⼀哈希来增强加密哈希密码。每段信息由美元符号 ($) 字符分隔
+
+### 配置密码期限
+
+![chage](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/rh124/chage.png)
+
+1. 让用户于2024-03-01日过期
+
+```bash
+[root@host1 ~]# chage -E 2024-03-01 lixiaohui
+```
+2. 用户下次登陆前必须改密码
+
+```bash
+[root@host1 ~]#  chage -d 0 lixiaohui
 ```
 
