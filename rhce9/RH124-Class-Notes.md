@@ -2389,3 +2389,218 @@ active
 
 ```
 
+# 第十章 配置和保护 SSH
+
+ OpenSSH 软件包提供了Secure Shell 或 SSH 协议。借助 SSH 协议，系统能够通过不安全的⽹络在加密和安全的通道中进⾏通信
+
+## SSH 命令的基本使用
+
+远程登录系统，不加用户名就是当前用户
+
+```bash
+[root@host1 ~]# ssh lxh-host2
+root@hosta's password: redhat
+[root@lxh-host2 ~]# exit
+[root@host1 ~]# 
+```
+
+```bash
+[root@host1 ~]# ssh lixiaohui@lxh-host2
+lixiaohui@lxh-host2's password: redhat
+[lixiaohui@lxh-host2 ~]$
+```
+
+查询系统中登录的用户
+
+```bash
+[lixiaohui@lxh-host2 ~]$ w
+ 11:03:15 up 10 min,  1 user,  load average: 0.04, 0.08, 0.08
+USER     TTY        LOGIN@   IDLE   JCPU   PCPU WHAT
+lixiaohu pts/0     11:03    1.00s  0.06s  0.02s w
+[lixiaohui@lxh-host2 ~]$ w -f
+ 11:03:19 up 10 min,  1 user,  load average: 0.03, 0.08, 0.08
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+lixiaohu pts/0    172.25.250.250   11:03    5.00s  0.04s  0.00s w -f
+```
+
+不以交互式方式登录对方，但是用对方的shell环境执行命令
+
+```bash
+[root@host1 ~]# ssh lixiaohui@lxh-host2 hostname
+lixiaohui@lxh-host2's password: redhat
+lxh-host2
+
+```
+
+## 主机密钥检查
+
+默认情况下，第一次去连接对方时，对方会给出他的公钥信息，客户端会比比对`/etc/ssh/ssh_known_hosts或 ~/.ssh/known_hosts ⽂件`中是否已经记录了相关信息，如果没有会问你是否连接对方，接受新密钥，则公钥的副本将保存在 ~/.ssh/known_hosts ⽂件中
+
+```bash
+[root@host1 ~]# ssh root@servera
+The authenticity of host 'lxh-host2 (192.168.1.18)' can't be established.
+ED25519 key fingerprint is SHA256:peUGgfxFNw6Jt6WK4CB2rs+jql1/LhA32M1+8zBawLI.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])?
+
+```
+
+## 禁用密钥检查
+
+交互式输入yes会打断自动化，所以可以在必要时禁用这个检查
+
+StrictHostKeyChecking 参数在⽤⼾特定的 `~/.ssh/config` ⽂件或系统范围的 `/etc/ssh/ssh_config` ⽂件中设置，或者通过指定 ssh 命令的 `-o StrictHostKeyChecking=` 选项来设置。
+
+```bash
+[root@host1 ~]# cat .ssh/config
+Host *.ilt.example.com f* g*
+    StrictHostKeyChecking no
+    PreferredAuthentications publickey
+    User kiosk
+Host classroom.example.com classroom c
+    StrictHostKeyChecking no
+    PreferredAuthentications publickey
+    User instructor
+Host *.example.com *
+    StrictHostKeyChecking no
+    PreferredAuthentications publickey
+    User student
+```
+
+```bash
+[root@serverb ~]# ssh -o StrictHostKeyChecking=yes root@servera
+No ED25519 host key is known for servera and you have requested strict checking.
+Host key verification failed.
+[root@serverb ~]# ssh -o StrictHostKeyChecking=no root@servera
+Warning: Permanently added 'servera' (ED25519) to the list of known hosts.
+root@servera's password:
+
+```
+
+## 基于 SSH 密钥的⾝份验证
+
+每次生成新密钥，都会覆盖原有密钥，导致无法用以前的密钥登录
+
+### 交互式生成密钥文件
+
+```bash
+[root@serverb ~]# ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/root/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /root/.ssh/id_rsa
+Your public key has been saved in /root/.ssh/id_rsa.pub
+The key fingerprint is:
+SHA256:rYI63NZpSyOrdieyUii4FiJn1hpisFay2MDMJpjVuJQ root@serverb.lab.example.com
+The key's randomart image is:
++---[RSA 3072]----+
+|   +             |
+|  E .            |
+|=+ .             |
+|**..     .       |
+|*=+.    S .      |
+|X=B ..   .       |
+|*O.+o.+..        |
+|o.*.=+=o         |
+|.o+B.+..         |
++----[SHA256]-----+
+
+```
+
+### 非交互式生成密钥文件
+
+```bash
+[root@serverb ~]# ssh-keygen -N '' -f ~/.ssh/id_rsa
+Generating public/private rsa key pair.
+Your identification has been saved in /root/.ssh/id_rsa
+Your public key has been saved in /root/.ssh/id_rsa.pub
+The key fingerprint is:
+SHA256:oAnis4J88dovDwoe8iLe6RqYC4xtsEfJybiRNlo14J4 root@serverb.lab.example.com
+The key's randomart image is:
++---[RSA 3072]----+
+|  .              |
+| . .             |
+|. o o .          |
+|.B * + .         |
+|==E.o   S        |
+|OX+ o            |
+|%B+. o           |
+|B=* =..          |
+|+=+* .+o         |
++----[SHA256]-----+
+
+```
+
+## 分发密钥
+
+分发公钥给所有需要被登录的机器，需要需要分发的公钥不在默认的位置，可以用-i参数来指定文件路径
+
+```bash
+[root@serverb ~]# ssh-copy-id student@servera
+...
+student@servera's password:
+
+Number of key(s) added: 1
+
+Now try logging into the machine, with:   "ssh 'student@servera'"
+and check to make sure that only the key(s) you wanted were added.
+
+[root@serverb ~]# ssh student@servera
+[student@servera ~]$
+
+```
+
+## ssh 密钥管理器
+
+如果在生成密钥的时候指定了使用密钥时的单独密码，每次使用私钥都会问你密码，这个非常不方便也不安全，可以将密钥缓存到ssh-agent程序中
+
+```bash
+[root@serverb ~]# ssh student@servera
+Enter passphrase for key '/root/.ssh/id_rsa':
+
+[root@serverb ~]#
+[root@serverb ~]# eval $(ssh-agent)
+Agent pid 1606
+[root@serverb ~]# ssh-add
+Enter passphrase for /root/.ssh/id_rsa:
+Identity added: /root/.ssh/id_rsa (root@serverb.lab.example.com)
+[root@serverb ~]# ssh student@servera
+Activate the web console with: systemctl enable --now cockpit.socket
+
+Register this system with Red Hat Insights: insights-client --register
+Create an account or view all your systems at https://red.ht/insights-dashboard
+Last login: Tue Feb  6 11:27:55 2024 from 172.25.250.11
+[student@servera ~]$
+
+```
+
+
+## ⾃定义 OpenSSH 服务配置
+
+sshd 守护进程提供 OpenSSH 服务。您可以通过编辑 /etc/ssh/sshd_config ⽂件来配置该服务
+
+## 禁⽌超级⽤⼾进⾏登录
+
+OpenSSH 服务器使⽤ /etc/ssh/sshd_config ⽂件中的 PermitRootLogin 配置设置，以允许或禁⽌⽤⼾以 root ⽤⼾⾝份登录系统
+
+设置为`without-password`后，只允许root用密钥登录，不允许密码登录
+
+设置后，需要重启sshd服务
+
+```bash
+[root@host1 ~]# grep PermitRootLogin /etc/ssh/sshd_config
+PermitRootLogin yes
+# the setting of "PermitRootLogin without-password".
+
+```
+
+## 禁⽌基于密码的⾝份验证
+
+一般来说，默认是启用的
+
+```bash
+[root@host1 ~]# grep PasswordAuthentication /etc/ssh/sshd_config
+#PasswordAuthentication yes
+
+```
