@@ -2203,3 +2203,189 @@ root     pts/0     21:58    5.00s  0.05s  0.01s w
 
 ```
 
+# 第九章 控制服务和守护进程
+
+## 了解 Systemd
+
+systemd 守护进程管理 Linux 的启动过程，⼀般包括服务启动和服务管理，在红帽企业 Linux 中，第⼀个启动的进程 (PID 1) 是 systemd 守护进程
+
+### 服务单元介绍
+
+单元通过称为`单元⽂件`的配置⽂件表⽰，其中封装了关于系统服务、侦听套接字以及与 systemd init 系统相关的其他对象的信息。单元具有`名称和单元类型`。名称为单元提供唯⼀标识。通过单元类型，可以将单元与其他类似的单元类型分组到⼀起
+
+### 列出服务单元
+
+使⽤ systemctl 命令来探索系统的当前状态
+
+```bash
+[root@host1 ~]# systemctl list-units --type=service
+  UNIT                               LOAD   ACTIVE SUB     DESCRIPTION                                                             >
+  accounts-daemon.service            loaded active running Accounts Service
+  atd.service                        loaded active running Deferred execution scheduler
+  auditd.service                     loaded active running Security Auditing Service
+  avahi-daemon.service               loaded active running Avahi mDNS/DNS-SD Stack
+  chronyd.service                    loaded active running NTP client/server
+
+```
+
+systemctl list-units --type=service 命令仅列出激活状态为 active 的服务单元。systemctl list-units --all 选项可列出所有服务单元，不论激活状态如何
+
+```bash
+[root@host1 ~]# systemctl list-units --type=service --all
+  UNIT                                   LOAD      ACTIVE   SUB     DESCRIPTION                                                    >
+  accounts-daemon.service                loaded    active   running Accounts Service
+● alsa-restore.service                   not-found inactive dead    alsa-restore.service
+● alsa-state.service                     not-found inactive dead    alsa-state.service
+● apparmor.service                       not-found inactive dead    apparmor.service
+  atd.service                            loaded    active   running Deferred execution scheduler
+  auditd.service                         loaded    active   running Security Auditing Service
+  auth-rpcgss-module.service             loaded    inactive dead    Kernel Module supporting RPCSEC_GSS
+● auto-cpufreq.service                   not-found inactive dead    auto-cpufreq.service
+  autofs.service                         loaded    inactive dead    Automounts filesystems on demand
+  avahi-daemon.service                   loaded    active   running Avahi mDNS/DNS-SD Stack
+
+```
+
+systemctl 命令 list-units 选项可显⽰ systemd 服务尝试解析并加载到内存中的单元。此选项不显⽰已安装但未启⽤的服务，可以使⽤ systemctl 命令 list-unit-files 选项来查看所有已安装的单元⽂件的状态
+
+```bash
+[root@host1 ~]# systemctl list-unit-files --type=service
+UNIT FILE                                  STATE           VENDOR PRESET
+accounts-daemon.service                    enabled         enabled
+arp-ethers.service                         disabled        disabled
+atd.service                                enabled         enabled
+auditd.service                             enabled         enabled
+auth-rpcgss-module.service                 static          -
+autofs.service                             disabled        disabled
+autovt@.service                            alias           -
+avahi-daemon.service                       enabled         enabled
+
+```
+
+## 查看服务状态
+
+使⽤ systemctl status name.type 命令来查看单元的状态
+
+```bash
+[root@host1 ~]# systemctl status sshd.service
+● sshd.service - OpenSSH server daemon
+     Loaded: loaded (/usr/lib/systemd/system/sshd.service; enabled; vendor preset: enabled)
+     Active: active (running) since Tue 2024-02-06 21:55:43 CST; 1h 37min ago
+       Docs: man:sshd(8)
+             man:sshd_config(5)
+   Main PID: 1314 (sshd)
+      Tasks: 1 (limit: 101924)
+     Memory: 8.4M
+        CPU: 111ms
+     CGroup: /system.slice/sshd.service
+             └─1314 "sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups"
+
+Feb 06 21:55:43 host1 systemd[1]: Starting OpenSSH server daemon...
+Feb 06 21:55:43 host1 sshd[1314]: Server listening on 0.0.0.0 port 22.
+Feb 06 21:55:43 host1 sshd[1314]: Server listening on :: port 22.
+Feb 06 21:55:43 host1 systemd[1]: Started OpenSSH server daemon.
+
+```
+
+## 验证服务的状态
+
+使⽤ systemctl 命令 is-active 选项来验证服务单元是否处于活动状态（正在运⾏）
+
+运⾏ systemctl 命令 is-enabled 选项可验证服务单元是否已启⽤为在系统引导期间⾃动启动
+
+验证单元是否在启动过程中失败，请运⾏ systemctl 命令 is-failed 选项
+
+要列出所有失败的单元，请运⾏ systemctl --failed --type=service 命令
+
+```bash
+[root@host1 ~]# systemctl is-active sshd.service
+active
+[root@host1 ~]# systemctl is-enabled sshd.service
+enabled
+[root@host1 ~]# systemctl is-failed sshd.service
+active
+[root@host1 ~]# systemctl --failed --type=service
+  UNIT LOAD ACTIVE SUB DESCRIPTION
+0 loaded units listed.
+
+```
+
+## 管理服务状态
+
+**启动服务**
+
+```bash
+[root@host1 ~]# systemctl start psacct.service
+```
+
+**停止服务**
+
+```bash
+[root@host1 ~]# systemctl stop psacct.service
+```
+
+**启用服务**
+
+启用服务使得服务器重启时， 此服务会自动启动，可以加`--now`来立刻影响服务状态
+
+```bash
+[root@host1 ~]# systemctl enable psacct.service
+Created symlink /etc/systemd/system/multi-user.target.wants/psacct.service → /usr/lib/systemd/system/psacct.service.
+```
+
+
+**禁用服务**
+
+禁用服务使得服务器重启时， 此服务会`不自动启动`，可以加`--now`来立刻影响服务状态
+
+```bash
+[root@host1 ~]# systemctl disable psacct.service
+Removed /etc/systemd/system/multi-user.target.wants/psacct.service.
+```
+
+**重启服务**
+
+```bash
+[root@host1 ~]# systemctl restart psacct.service
+```
+
+**重新加载服务**
+
+修改了配置文件的参数时，不一定要重启服务，因为重启服务会结束进程，重新启动，而reload是在现有进程基础上重新加载新参数
+
+```bash
+[root@host1 ~]# systemctl reload psacct.service
+```
+
+**列出服务的依赖项**
+
+```bash
+[root@host1 ~]# systemctl list-dependencies sshd.service
+sshd.service
+● ├─system.slice
+● ├─sshd-keygen.target
+○ │ ├─sshd-keygen@ecdsa.service
+○ │ ├─sshd-keygen@ed25519.service
+○ │ └─sshd-keygen@rsa.service
+● └─sysinit.target
+●   ├─dev-hugepages.mount
+
+```
+
+**屏蔽服务**
+
+部分服务之间可能彼此冲突，或者你不需要停止a服务后，a服务又被其他管理员启动或被b服务唤醒
+
+```bash
+[root@host1 ~]# systemctl mask psacct.service
+Created symlink /etc/systemd/system/psacct.service → /dev/null.
+[root@host1 ~]# systemctl restart psacct
+Failed to restart psacct.service: Unit psacct.service is masked.
+[root@host1 ~]# systemctl unmask psacct.service
+Removed /etc/systemd/system/psacct.service.
+[root@host1 ~]# systemctl restart psacct
+[root@host1 ~]# systemctl is-active psacct
+active
+
+```
+
