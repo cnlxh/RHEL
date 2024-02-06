@@ -1946,3 +1946,260 @@ drwxr-xr-x. 2 root root 6 Feb  6 00:49 foldertest/
 
 你可以在命令行中输入umask xxxx回车，但是这只有临时生效，你可以放入家目录中的`.bashrc`只影响自己一个人，也可以把`umask xxxx`这个内容放入`/etc/bashrc或/etc/profile`影响整个系统
 
+# 第八章 监控和管理 Linux 进程
+
+## 了解进程
+
+`进程：`进程是已启动的可执⾏程序的运⾏中实例
+
+## PS 查询进程
+
+进程有多个状态，要警惕`僵尸状态的进程`，查询状态的命令如下：
+
+1. ps
+
+ps 通常是一次性的输出，可以用于配合grep来筛选特定进程是否存在
+
+```bash
+[root@host1 ~]# ps aux
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root        1314  0.0  0.0  16064  9380 ?        Ss   21:55   0:00 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
+root        2660  0.0  0.0  19444 12360 ?        Ss   21:58   0:00 sshd: root [priv]
+root        2667  0.0  0.0  19444 12176 ?        Ss   21:58   0:00 sshd: root [priv]
+root        2696  0.0  0.0  19712  7336 ?        S    21:58   0:00 sshd: root@pts/0
+root        2718  0.0  0.0  19444  6496 ?        S    21:58   0:00 sshd: root@notty
+root        2793  0.0  0.0 221800  2356 pts/0    S+   22:04   0:00 grep --color=auto sshd
+```
+
+在查询中，注意--color=auto这一行，这一行是ps命令回车产生的命令本身进程，并不算查询结果中的一个
+
+```bash
+[root@host1 ~]# ps aux | grep sshd
+root        1314  0.0  0.0  16064  9380 ?        Ss   21:55   0:00 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
+root        2660  0.0  0.0  19444 12360 ?        Ss   21:58   0:00 sshd: root [priv]
+root        2667  0.0  0.0  19444 12176 ?        Ss   21:58   0:00 sshd: root [priv]
+root        2696  0.0  0.0  19712  7336 ?        S    21:58   0:00 sshd: root@pts/0
+root        2718  0.0  0.0  19444  6496 ?        S    21:58   0:00 sshd: root@notty
+root        2797  0.0  0.0 221800  2192 pts/0    S+   22:05   0:00 grep --color=auto sshd
+
+```
+
+查询进程之间的依赖
+
+```bash
+[root@host1 ~]# pstree
+systemd─┬─ModemManager───3*[{ModemManager}]
+        ├─NetworkManager───2*[{NetworkManager}]
+        ├─VGAuthService
+        ├─accounts-daemon───3*[{accounts-daemon}]
+        ├─anacron
+        ├─atd
+        ├─auditd─┬─sedispatch
+        │        └─2*[{auditd}]
+        ├─avahi-daemon───avahi-daemon
+        ├─chronyd
+        ├─colord───3*[{colord}]
+        ├─crond
+        ├─dbus-broker-lau───dbus-broker
+        ├─dhcpd
+        ├─2*[dnsmasq───dnsmasq]
+        ├─dnsmasq
+        ├─firewalld───{firewalld}
+        ├─fwupd───4*[{fwupd}]
+        ├─gdm─┬─gdm-session-wor─┬─gdm-wayland-ses─┬─gnome-session-b───3*[{gnome-session-b}]
+        │     │                 │                 └─2*[{gdm-wayland-ses}]
+        │     │                 └─2*[{gdm-session-wor}]
+        │     └─2*[{gdm}]
+
+```
+
+树形格式查询进程
+
+```bash
+[root@host1 ~]# ps --forest
+    PID TTY          TIME CMD
+   2710 pts/0    00:00:00 bash
+   2817 pts/0    00:00:00  \_ ps
+
+```
+
+## top 查询进程
+
+1. top
+
+top 通常用于动态观察系统的压力情况，和Windows 任务管理器相似
+
+```bash
+[root@host1 ~]# top
+top - 22:07:00 up 11 min,  2 users,  load average: 0.00, 0.03, 0.04
+Tasks: 427 total,   1 running, 426 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem :  15966.9 total,  14038.1 free,   1339.8 used,    589.0 buff/cache
+MiB Swap:  65536.0 total,  65536.0 free,      0.0 used.  14328.7 avail Mem
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+   2804 root      20   0  226316   4392   3512 R   6.2   0.0   0:00.01 top
+      1 root      20   0  172500  16788  10384 S   0.0   0.1   0:01.67 systemd
+      2 root      20   0       0      0      0 S   0.0   0.0   0:00.06 kthreadd
+      3 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_gp
+      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_par_gp
+
+```
+
+我们注意到top命令右上角有一个 `load average`，这是系统的平均负载，表⽰⼀段时间内感知的系统负载，三个数字是最近 1 分钟、5 分钟和 15 分钟内的平均值
+
+`负载平均值`代表⼀段时间内感知的系统负载。通过报告 CPU 上准备运⾏的进程数以及等待磁盘或⽹络 I/O 完成的进程数，Linux 可以确定负载平均值
+
+还可以通过以下命令显示这三个数字：
+
+```bash
+[root@host1 ~]# uptime
+ 22:12:50 up 17 min,  2 users,  load average: 0.00, 0.00, 0.01
+
+```
+
+**这个数字和你的CPU核心数有关系，有一个核心，那每个数字最好都不好接近或超过1，趋近于1就说明CPU可能处于100%，两个核心，那就是不要趋近于2**
+
+### 查询CPU信息
+
+可以看出，我的电脑有4个CPU，每个cpu插槽里有4个核心，每个核心是一个超线程，那就是我有16核心
+
+```bash
+[root@host1 ~]# lscpu
+Architecture:            x86_64
+  CPU op-mode(s):        32-bit, 64-bit
+  Address sizes:         45 bits physical, 48 bits virtual
+  Byte Order:            Little Endian
+CPU(s):                  16
+  On-line CPU(s) list:   0-15
+Vendor ID:               GenuineIntel
+  BIOS Vendor ID:        GenuineIntel
+  Model name:            11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+    BIOS Model name:     11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+    CPU family:          6
+    Model:               141
+    Thread(s) per core:  1
+    Core(s) per socket:  4
+    Socket(s):           4
+
+```
+
+```bash
+[root@host1 ~]# grep "model name" /proc/cpuinfo | wc -l
+16
+[root@host1 ~]# grep "model name" /proc/cpuinfo
+model name      : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+model name      : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+model name      : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+model name      : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+model name      : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+model name      : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+model name      : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+model name      : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+model name      : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+model name      : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+model name      : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+model name      : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+model name      : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+model name      : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+model name      : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+model name      : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+
+```
+
+### TOP 快捷键
+
+|快捷键|效果|
+|-|-|
+|u|过滤⽤⼾名称|
+|M|按照内存使⽤率，以降序⽅式对进程列表排序|
+|P|按照处理器使⽤率，以降序⽅式对进程列表排序|
+|k|中止特定进程|
+|r|调整nice值|
+|h|查询top命令其他快捷键或帮助|
+
+## 进程或作业管理
+
+每一次的shell命令回车，系统都会创建一个作业或进程
+
+### 前后台任务调度
+
+**安排后台作业**
+
+任何命令或管道都可以在后台启动，只需在命令上附加⼀个 & 符号即可
+
+我们在后台安排了一个任务，并看到作业编号为1，进程编号为2875
+
+```bash
+[lixiaohui@host1 ~]$ sleep 1000 &
+[1] 2875
+[lixiaohui@host1 ~]$ jobs
+[1]+  Running                 sleep 1000 &
+
+```
+
+如果将包含竖线 (|) 的命令⾏发送到后台，将显⽰管道中最后⼀个命令的 PID
+
+**将后台作业调度到前台**
+
+使⽤ fg 命令将后台作业置于前台。使⽤ (%jobNumber) 格式将进程指定到前台
+
+**+ 符号表⽰此作业是当前的默认作业。如果不带 %jobNumber 参数使⽤作业控制命令，则对默认作业执⾏操作。- 符号表⽰在当前默认作业完成时将成为默认作业的上⼀作业。**
+
+```bash
+[lixiaohui@host1 ~]$ jobs
+[1]+  Running                 sleep 1000 &
+[lixiaohui@host1 ~]$
+[lixiaohui@host1 ~]$ fg %1
+sleep 1000
+
+```
+
+**将前台作业调度到后台**
+
+要将前台进程发送到后台，在终端中按键盘⽣成的暂停请求 (Ctrl+z)。该作业将被置于后台并暂停，然后执行bg %NUMBER继续后台运行
+
+```bash
+[lixiaohui@host1 ~]$ jobs
+[1]+  Running                 sleep 1000 &
+[lixiaohui@host1 ~]$
+[lixiaohui@host1 ~]$ fg %1
+sleep 1000
+^Z
+[1]+  Stopped                 sleep 1000
+[lixiaohui@host1 ~]$ jobs
+[1]+  Stopped                 sleep 1000
+[lixiaohui@host1 ~]$ bg %1
+[1]+ sleep 1000 &
+[lixiaohui@host1 ~]$ jobs
+[1]+  Running                 sleep 1000 &
+
+```
+
+### 查询特定所用的所有进程
+
+```bash
+[lixiaohui@host1 ~]$ pgrep -u lixiaohui
+2849
+2875
+
+```
+
+### 杀死特定用户的所有进程
+
+有时候我们可能会怀疑被人非法入侵，我们需要知道有谁登录了系统，如果异常，要把用户踢下去
+
+```bash
+[root@host1 ~]# w
+ 22:46:55 up 51 min,  2 users,  load average: 0.00, 0.00, 0.00
+USER     TTY        LOGIN@   IDLE   JCPU   PCPU WHAT
+laoli    tty2      21:55   51:15   0.06s  0.06s /usr/libexec/gnome-session-binary
+root     pts/0     21:58    6.00s  0.03s  0.00s w
+[root@host1 ~]# pkill -u laoli
+[root@host1 ~]# w
+ 22:47:02 up 51 min,  1 user,  load average: 0.00, 0.00, 0.00
+USER     TTY        LOGIN@   IDLE   JCPU   PCPU WHAT
+root     pts/0     21:58    5.00s  0.05s  0.01s w
+
+```
+
