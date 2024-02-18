@@ -2604,3 +2604,430 @@ PermitRootLogin yes
 #PasswordAuthentication yes
 
 ```
+
+# 第十一章 管理网络
+
+## 网络接口名称的变化
+
+在RHEL 7之后，不再用eth0、eth1来标记网络接口，系统将基于固件信息、PCI 总线拓扑及⽹络设备的类型来分配⽹络接⼝名称
+
+⽹络接⼝名称以接⼝类型开头：
+- 以太⽹接⼝以 en 开头
+- WLAN 接⼝以 wl 开头
+- WWAN 接⼝以 ww 开头
+
+在类型之后，接⼝名称的其余部分将基于服务器固件所提供的信息，或由 PCI 拓扑中设备的位置确定。
+
+- oN 表⽰板载设备，其唯⼀索引为 N，来⾃服务器的固件。eno1 名称是板载以太⽹设备 1。
+- sN 表⽰这是⼀个位于 PCI 热插拔插槽 N 中的设备。例如，ens3 代表 PCI 热插拔插槽 3 中的以太
+⽹卡。
+- pMsN 表⽰这是⼀个位于插槽 N 中总线 M 上的 PCI 设备。wlp4s0 接⼝是位于插槽 0 中 PCI 总线 4
+上的 WLAN 卡。
+
+## IPV4和IPV6
+
+### IPV4概述
+
+`IPv4` 地址是⼀个 `32 位数字`，使⽤点号分隔的四个⼗进制⼋位字节（取值范围从 0 到 255）来表⽰。
+
+此类地址分为两个部分，即⽹络前缀和主机编号。⽹络前缀标识唯⼀的物理或虚拟⼦⽹。主机号标识⼦⽹上的特定主机。同一子网中的主机可以无需网关互相通信，⽹络⽹关连接不同的⽹络，⽹络路由器通常充当⼦⽹的⽹关
+
+### IPV4 地址计算公式
+
+192.168.1.0/24中一共有多少个地址可用？
+
+```text
+2^(32-24)  //2的32-24次方
+```
+
+对于/24子网，子网掩码是255.255.255.0，这意味着前24位是网络地址，最后8位是主机地址。因此，我们有2^8 = 256个可能的地址组合。
+
+但是，我们需要减去两个地址：
+
+1. 网络地址（Network Address）：它是子网的第一个地址，用于标识整个子网。例如，在192.168.1.0/24子网中，网络地址是192.168.1.0。
+
+2. 广播地址（Broadcast Address）：它是子网的最后一个地址，用于向子网内的所有设备发送广播消息。在192.168.1.0/24子网中，广播地址是192.168.1.255。
+
+因此，对于/24子网，实际可用的主机地址是256（总地址数） - 2（网络地址和广播地址） = 254个。
+
+### IPV6概述
+
+`IPv6` 地址是⼀个 `128 位数字`，通常表⽰为⼋组以分号分隔的四个⼗六进制半字节。每个半字节均表⽰ 4 位的 IPv6 地址，因此每个组表⽰ 16 位的 IPv6 地址，在IPV6中的字母只能时`A-F`。
+
+```text
+2001:0db8:0000:0010:0000:0000:0000:0001
+```
+
+### 简化IPV6写法
+
+1. 去掉前导零
+
+```text
+2001:db8:0:10:0:0:0:1
+```
+
+2. 去掉连续零
+
+连续都是0时，用::表示，但是一个地址中只能出现一次
+
+```text
+2001:db8:0:10::1
+```
+
+3. 加端口的写法
+
+如果在 IPv6 地址后⾯包括 TCP 或 UDP ⽹络端⼝，请始终将 IPv6 地址括在⽅括号中，以便端⼝不会被误认为是地址的⼀部分。
+
+```bash
+[2001:db8:0:10::1]:80
+```
+
+## 主机名解析和 IP 地址映射
+
+1. `/etc/hosts` ⽂件中为每个主机名创建静态条⽬，但是需要管理员手工更新，且只影响此机器，影响不到别的机器
+
+2. `/etc/resolv.conf` ⽂件中列出了所有使用中的DNS服务器地址
+
+## 查询网络接口和IP
+
+```bash
+[root@lixiaohui ~]# ip addr show
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: ens160: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 00:0c:29:6a:16:13 brd ff:ff:ff:ff:ff:ff
+    inet 172.25.254.250/24 brd 172.25.254.255 scope global noprefixroute br0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::20c:29ff:fe6a:1613/64 scope link noprefixroute
+       valid_lft forever preferred_lft forever
+
+```
+1. 网络接口有2个，`lo和ens160`，其中`lo`为连接到服务器本⾝的环回设备，`不能用于网络互通`
+2. `ens160`接口上的IPV4地址是：172.25.254.250/24
+3. `ens160`接口上的MAC地址是：00:0c:29:6a:16:13
+4. `ens160`接口上的IPV6地址是：fe80::20c:29ff:fe6a:1613/64
+
+## 测试网络通畅
+
+`ping` 命令可以测试连接。该命令将持续运⾏，直到按下 `Ctrl+c` 为⽌，或者指定`-c`参数
+
+`ping6`命令可以测试ipv6连接
+
+```bash
+[root@lixiaohui ~]# ping 127.0.0.1
+PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
+64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.062 ms
+64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.130 ms
+64 bytes from 127.0.0.1: icmp_seq=3 ttl=64 time=0.079 ms
+^C
+--- 127.0.0.1 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2314ms
+rtt min/avg/max/mdev = 0.062/0.090/0.130/0.028 ms
+
+[root@lixiaohui ~]# ping -c 2 127.0.0.1
+PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
+64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.064 ms
+64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.083 ms
+
+--- 127.0.0.1 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1166ms
+rtt min/avg/max/mdev = 0.064/0.073/0.083/0.009 ms
+
+[root@lixiaohui ~]# ping6 fe80::c38a:ac39:36a1:a43c
+PING fe80::c38a:ac39:36a1:a43c(fe80::c38a:ac39:36a1:a43c) 56 data bytes
+
+```
+
+## 查询路由
+
+```bash
+[root@lixiaohui ~]# ip route
+default via 172.25.250.254 dev eth0 proto static metric 100
+172.25.250.0/24 dev eth0 proto kernel scope link src 172.25.250.10 metric 100
+[root@lixiaohui ~]# ip -6 route
+::1 dev lo proto kernel metric 256 pref medium
+fe80::/64 dev eth0 proto kernel metric 1024 pref medium
+
+```
+
+## 追踪流量路由
+
+可使⽤ `traceroute` `或tracepath` 命令来完成追踪流量路由，通常，默认情况下系统不安装 `traceroute` 命令。
+
+`tracepath6` 和 `traceroute -6` 命令等效于 IPv6 版本的 `tracepath` 和 `traceroute` 命令。
+
+```bash
+[root@lixiaohui ~]# tracepath classroom
+ 1?: [LOCALHOST]                      pmtu 1500
+ 1:  bastion.lab.example.com                               0.901ms
+ 1:  bastion.lab.example.com                               0.355ms
+ 2:  172.25.254.254                                        1.561ms reached
+     Resume: pmtu 1500 hops 2 back 2
+
+```
+
+## 端⼝和服务故障排除
+
+`/etc/services` ⽂件中列出了标准端⼝的常⽤名称
+
+`ss` 命令可⽤于显⽰套接字统计信息。`ss` 命令取代了 `net-tools` 软件包中所含的较早的⼯具`netstat`
+
+```bash
+[root@lixiaohui ~]# ss -tunlpa
+Netid    State     Recv-Q    Send-Q       Local Address:Port          Peer Address:Port     Process
+udp      UNCONN    0         0                  0.0.0.0:111                0.0.0.0:*         users:(("rpcbind",pid=741,fd=5),("systemd",pid=1,fd=42))
+udp      UNCONN    0         0                127.0.0.1:323                0.0.0.0:*         users:(("chronyd",pid=786,fd=5))
+udp      UNCONN    0         0                     [::]:111                   [::]:*         users:(("rpcbind",pid=741,fd=7),("systemd",pid=1,fd=46))
+udp      UNCONN    0         0                    [::1]:323                   [::]:*         users:(("chronyd",pid=786,fd=6))
+tcp      LISTEN    0         128                0.0.0.0:22                 0.0.0.0:*         users:(("sshd",pid=808,fd=3))
+tcp      LISTEN    0         4096               0.0.0.0:111                0.0.0.0:*         users:(("rpcbind",pid=741,fd=4),("systemd",pid=1,fd=41))
+tcp      ESTAB     0         0            172.25.250.10:22          172.25.250.250:35520     users:(("sshd",pid=1082,fd=4),("sshd",pid=1069,fd=4))
+tcp      LISTEN    0         128                   [::]:22                    [::]:*         users:(("sshd",pid=808,fd=4))
+tcp      LISTEN    0         4096                  [::]:111                   [::]:*         users:(("rpcbind",pid=741,fd=6),("systemd",pid=1,fd=43))
+
+```
+
+1. `-n` 显⽰接⼝和端⼝的编号，⽽不显⽰名称
+2. `-t` 显⽰ TCP 套接字
+3. `-u` 显⽰ UDP 套接字
+4. `-l` 仅显⽰侦听中的套接字
+5. `-a` 显⽰所有（侦听中和已建⽴的）套接字
+6. `-p` 显⽰使⽤套接字的进程
+
+## NetworkManager
+
+可以通过命令⾏或图形⼯具与 NetworkManager 服务交互。服务配置⽂件存储在 `/etc/NetworkManager/system
+connections/` ⽬录中。
+
+NetworkManager 服务⽤于管理⽹络设备和⽹络连接。
+
+1. 设备是提供⽹络流量的物理或虚拟⽹络接⼝。
+2. 连接拥有单个⽹络设备的相关配置设置。连接也可称为⽹络配置集。每个连接必须具有唯⼀的名称或 ID，可以与其配置的设备名称匹配，`单个设备可以有多个连接配置并在它们之间切换，但每个设备只能有⼀个连接处于活跃状态`
+
+## 查看⽹络信息
+
+以下信息中，eth0这个网络是类型是Ethernet，并已经连接到lxh-connection的链接，eno2的state部分显示disconnected，表示此接口此时不用于网络通信
+
+```bash
+[root@lixiaohui ~]# nmcli device status
+DEVICE  TYPE      STATE      CONNECTION
+eth0    ethernet  connected  lxh-connection
+lo      loopback  unmanaged  --
+eno2    ethernet  disconnected  --
+```
+
+## 查询所有链接
+
+`nmcli connection show` 命令可显⽰所有连接的列表。使⽤ `--active` 选项可仅列出活动的连接
+
+```bash
+[root@lixiaohui ~]# nmcli con show
+NAME         UUID                                  TYPE            DEVICE
+eno2         ff9f7d69-db83-4fed-9f32-939f8b5f81cd  802-3-ethernet  -
+static-ens3  72ca57a2-f780-40da-b146-99f71c431e2b  802-3-ethernet  ens3
+eno1         87b53c56-1f5d-4a29-a869-8a7bdaf56dfa  802-3-ethernet  eno1
+[root@lixiaohui ~]# nmcli con show --active
+NAME         UUID                                  TYPE            DEVICE
+static-ens3  72ca57a2-f780-40da-b146-99f71c431e2b  802-3-ethernet  ens3
+eno1         87b53c56-1f5d-4a29-a869-8a7bdaf56dfa  802-3-ethernet  eno1
+```
+
+查询具体的网络连接详情
+
+```bash
+[root@lixiaohui system-connections]# nmcli connection show lxh-con2
+connection.id:                          lxh-con2
+connection.uuid:                        f2af0cda-b25c-4688-9df3-2b4f8428f407
+connection.stable-id:                   --
+connection.type:                        802-3-ethernet
+connection.interface-name:              eth0
+connection.autoconnect:                 yes
+connection.autoconnect-priority:        0
+connection.autoconnect-retries:         -1 (default)
+connection.multi-connect:               0 (default)
+```
+
+## 添加⽹络连接
+
+使⽤ `nmcli connection add` 命令来添加⽹络连接，可以采取`TAB键`不断的补齐参数
+
+以下命令将`lxh-con2`添加到`eth0`设备上，并将IPV4设置为`1.1.1.1/24`，网关设置为`1.1.1.2`，DNS设置为`1.1.1.3`，需要特别注意`ipv4.method` 参数设置为`manual`，只有设置为manual，你手工设置的网络信息才会优先生效，`autoconnect yes`为服务器重启时，`自动激活`此链接
+
+```bash
+[root@lixiaohui ~]# nmcli connection add con-name lxh-con2 type ethernet ifname eth0 ipv4.method manual ipv4.addresses 1.1.1.1/24 ipv4.gateway 1.1.1.12 ipv4.dns 1.1.1.3 autoconnect yes
+Connection 'lxh-con2' (f2af0cda-b25c-4688-9df3-2b4f8428f407) successfully added.
+[root@lixiaohui ~]# nmcli con show
+NAME                UUID                                  TYPE      DEVICE
+Wired connection 1  ec3a15fb-2e26-3254-9433-90c66981e924  ethernet  eth0
+lxh-con2            f2af0cda-b25c-4688-9df3-2b4f8428f407  ethernet  --
+
+```
+
+以下命令将`lxh-con3`添加到`eth0`设备上，并将IPV6设置为`2000::1/64`，网关设置为`2000::2`，DNS设置为2000::3`，需要特别注意`ipv6.method` 参数设置为`manual`，只有设置为manual，你手工设置的网络信息才会优先生效，`autoconnect yes`为服务器重启时，`自动激活`此链接
+
+```bash
+[root@lixiaohui ~]# nmcli connection add con-name lxh-con3 type ethernet ifname eth0 ipv6.method manual ipv6.addresses "2000::1/64" ipv6.gateway "2000::2" ipv6.dns "2000::3" autoconnect yes
+Connection 'lxh-con3' (9f7c282c-9254-45cf-a020-24acac1639b1) successfully added.
+[root@lixiaohui ~]# nmcli connection show
+NAME                UUID                                  TYPE      DEVICE
+Wired connection 1  ec3a15fb-2e26-3254-9433-90c66981e924  ethernet  eth0
+lxh-con2            f2af0cda-b25c-4688-9df3-2b4f8428f407  ethernet  --
+lxh-con3            9f7c282c-9254-45cf-a020-24acac1639b1  ethernet  --
+
+```
+
+查看具体的网络配置文件
+
+```bash
+[root@lixiaohui system-connections]# cat /etc/NetworkManager/system-connections/lxh-con2.nmconnection
+[connection]
+id=lxh-con2
+uuid=f2af0cda-b25c-4688-9df3-2b4f8428f407
+type=ethernet
+interface-name=eth0
+
+[ethernet]
+
+[ipv4]
+address1=1.1.1.1/24,1.1.1.12
+dns=1.1.1.3;
+method=manual
+
+[ipv6]
+addr-gen-mode=stable-privacy
+method=auto
+
+[proxy]
+
+```
+
+## 修改网络连接
+
+将`lxh-con2`的连接IP改为`2.2.2.2/24`，并添加另一个IP地址`3.3.3.3/24`到此连接上
+
+`+`号可以用在ip地址、dns等信息上，用于添加辅助网络信息
+
+```bash
+[root@lixiaohui ~]# nmcli connection modify lxh-con2 ipv4.addresses 2.2.2.2/24 +ipv4.addresses 3.3.3.3/24
+[root@lixiaohui ~]# nmcli connection show lxh-con2 | grep ipv4
+ipv4.method:                            manual
+ipv4.dns:                               1.1.1.3
+ipv4.dns-search:                        --
+ipv4.dns-options:                       --
+ipv4.dns-priority:                      0
+ipv4.addresses:                         2.2.2.2/24, 3.3.3.3/24
+ipv4.gateway:                           1.1.1.12
+
+```
+## 激活网络连接
+
+需要注意的是，`一个设备同时只能激活一个连接`
+
+```bash
+[root@lixiaohui ~]# nmcli connection up lxh-con2
+```
+
+## 关闭网络连接
+
+关闭网络连接后，可能会`面临断网`的情况
+
+```bash
+[root@lixiaohui ~]# nmcli connection down lxh-con2
+```
+
+除了关闭网络连接外，还可以直接断开网络设备的连接
+
+```bash
+[root@lixiaohui ~]# nmcli device disconnect eth0
+```
+
+## 重新加载网络连接
+
+```bash
+[root@lixiaohui ~]# nmcli connection reload lxh-con2
+```
+
+## 删除网络连接
+
+```bash
+[root@lixiaohui ~]# nmcli connection delete lxh-con2
+```
+
+## 更新系统主机名
+
+`hostname`或`hostnamectl`命令可以显示主机名，`hostnamectl`命令可以设置主机名，主机名将放入到`/etc/hostname`中
+
+```bash
+[root@lixiaohui ~]# hostnamectl
+ Static hostname: lixiaohui
+       Icon name: computer-vm
+         Chassis: vm 🖴
+      Machine ID: ace63d6701c2489ab9c0960c0f1afe1d
+         Boot ID: d845959153e74e6fb3e9d157c18b851f
+  Virtualization: kvm
+Operating System: Red Hat Enterprise Linux 9.0 (Plow)
+     CPE OS Name: cpe:/o:redhat:enterprise_linux:9::baseos
+          Kernel: Linux 5.14.0-70.13.1.el9_0.x86_64
+    Architecture: x86-64
+ Hardware Vendor: Red Hat
+  Hardware Model: KVM
+
+[root@lixiaohui ~]# hostnamectl hostname test
+[root@lixiaohui ~]# cat /etc/hostname
+test
+[root@lixiaohui ~]# sudo -i
+[root@test ~]#
+```
+
+## 配置名称解析
+
+1. `/etc/hosts` ⽂件中为每个主机名创建静态条⽬，但是需要管理员手工更新，且只影响此机器，影响不到别的机器
+
+2. `/etc/resolv.conf` ⽂件中列出了所有使用中的DNS服务器地址
+
+测试一下DNS名称解析
+
+`getent`将先查询`/etc/hosts`，如果没找到，才找dns服务器，所以此命令可以帮助测试hosts文件
+
+`host、dig不会查看/etc/hosts`
+
+```bash
+[root@lixiaohui ~]# host servera
+servera.lab.example.com has address 172.25.250.10
+
+[root@lixiaohui ~]# getent hosts servera
+172.25.250.10   servera.lab.example.com
+
+[root@lixiaohui ~]# dig servera.lab.example.com
+
+; <<>> DiG 9.16.23-RH <<>> servera.lab.example.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 4557
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 1, ADDITIONAL: 2
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: 8265a3a3071b4061ba7ea74165d1ef6e76e9842339bf54cf (good)
+;; QUESTION SECTION:
+;servera.lab.example.com.       IN      A
+
+;; ANSWER SECTION:
+servera.lab.example.com. 86400  IN      A       172.25.250.10
+
+;; AUTHORITY SECTION:
+lab.example.com.        86400   IN      NS      utility.lab.example.com.
+
+;; ADDITIONAL SECTION:
+utility.lab.example.com. 86400  IN      A       172.25.250.220
+
+;; Query time: 4 msec
+;; SERVER: 172.25.250.220#53(172.25.250.220)
+;; WHEN: Sun Feb 18 06:52:14 EST 2024
+;; MSG SIZE  rcvd: 134
+
+```
