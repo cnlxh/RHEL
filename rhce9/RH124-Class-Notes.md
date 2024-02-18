@@ -3031,3 +3031,328 @@ utility.lab.example.com. 86400  IN      A       172.25.250.220
 ;; MSG SIZE  rcvd: 134
 
 ```
+
+# 第十二章 安装和更新软件包
+
+## 系统订阅与注册
+
+Linux 系统需要以安装软件包的方式丰富服务器功能，而红帽提供了在线的增值服务，给我们提供高质量的软件包仓库，我们从仓库中可以安装软件，这要求我们将系统注册到红帽网络，这个会涉及到购买服务，作为开发者，可以用以下连接完成注册为开发者，临时获得此服务
+
+```bash
+RHEL 开发者订阅注册：https://developers.redhat.com/register
+```
+
+以下命令完成了系统注册
+
+```bash
+[root@lixiaohui ~]# subscription-manager register --username 939958092@qq.com
+Registering to: subscription.rhsm.redhat.com:443/subscription
+Password:
+The system has been registered with ID: 4aa93fdb-8d29-4e72-b97b-b5ab5421ea8e
+The registered system name is: lixiaohui
+```
+以下命令取消了系统注册
+
+```bash
+[root@lixiaohui ~]# subscription-manager unregister
+Unregistering from: subscription.rhsm.redhat.com:443/subscription
+System has been unregistered.
+
+```
+
+
+## RPM 软件包描述
+
+RPM 软件包管理器最初是由红帽开发的，提供了⼀种标准的⽅式来打包软件进⾏分发，借助 RPM 软件包，管理员可以跟踪软件包会安装哪些⽂件，卸载软件包时将删除哪些⽂件，并且在安装时验证是否存在⽀持软件包
+
+RPM 软件包⽂件名由四个元素组成（再加上 .rpm 后缀）：name-version-release.architecture：
+
+
+`coreutils-8.32-21.el9.x86_64.rpm`
+
+1. coreutils是名字
+
+2. 8.32是版本
+
+3. 21.el9是发行版本号以及平台名称，此处是适用于el9的21此发行版本
+
+4. x86_64是CPU指令集，这代表64位
+
+- rpm -qa ：列出所有已安装的软件包
+- rpm -qf FILENAME ：确定提供 FILENAME 的软件包
+- rpm -q coreutils：列出当前安装的软件包版本
+- rpm -qi coreutils：获取软件包的详细信息。
+- rpm -ql coreutils：列出软件包安装的⽂件
+- rpm -qc coreutils：仅列出软件包安装的配置⽂件
+- rpm -qd coreutils：仅列出软件包安装的⽂档⽂件
+- rpm -q --scripts ：列出在安装或删除软件包之前或之后运⾏的 shell 脚本
+- rpm -q --changelog ：列出软件包的更改⽇志信息
+- rpm -qlp coreutils-8.32-21.el9.x86_64.rpm：列出本地软件包安装的⽂件。
+- rpm -ivh podman-4.0.0-6.el9.x86_64.rpm。使⽤ rpm 命令来安装已下载到本地⽬录的 RPM 软件包
+- rpm2cpio httpd-2.4.51-7.el9_0.x86_64.rpm | cpio -idv rpm2cpio 命令将 RPM 软件包转换为 cpio 归档。将 RPM 软件包转换为 cpio 归档后，可以使⽤cpio 命令提取⽂件列表
+
+## DNF 管理软件包
+
+在新版本的Linux上，DNF命令取代了以前的YUM命令，但YUM依旧可以使用，但会自动链接到DNF并执行
+
+### DNF 仓库配置
+
+和RPM不同，DNF依赖于仓库的存在，DNF并不要求你指定软件包的具体位置，你只需要指定名称，就可以通过DNF命令来完成安装、更新、卸载等操作，DNF会自动从你配置的仓库中，搜索下载软件包
+
+列出本地仓库
+
+```bash
+[root@lixiaohui ~]# dnf repolist all
+repo id                               repo name                                        status
+rhel-9.0-for-x86_64-appstream-rpms    Red Hat Enterprise Linux 9.0 AppStream (dvd)     enabled
+rhel-9.0-for-x86_64-baseos-rpms       Red Hat Enterprise Linux 9.0 BaseOS (dvd)        enabled
+```
+
+所有的仓库将以文件的方式存在于/etc/yum.repos.d/中，此路径中包括在系统中可用的仓库文件，文件名要求以repo结尾，具体格式如下：
+
+```ini
+[root@lixiaohui ~]# cat /etc/yum.repos.d/rhel_dvd.repo
+[rhel-9.0-for-x86_64-baseos-rpms]
+baseurl = http://content.example.com/rhel9.0/x86_64/dvd/BaseOS
+enabled = 1
+gpgcheck = false
+name = Red Hat Enterprise Linux 9.0 BaseOS (dvd)
+[rhel-9.0-for-x86_64-appstream-rpms]
+baseurl = http://content.example.com/rhel9.0/x86_64/dvd/AppStream
+enabled = true
+gpgcheck = false
+name = Red Hat Enterprise Linux 9.0 AppStream (dvd)
+
+```
+
+
+### 禁用和启用仓库
+
+```bash
+[root@lixiaohui ~]# dnf config-manager --disable rhel-9.0-for-x86_64-baseos-rpms
+[root@lixiaohui ~]# dnf repolist all
+repo id                               repo name                                        status
+rhel-9.0-for-x86_64-appstream-rpms    Red Hat Enterprise Linux 9.0 AppStream (dvd)     enabled
+rhel-9.0-for-x86_64-baseos-rpms       Red Hat Enterprise Linux 9.0 BaseOS (dvd)        disabled
+```
+
+```bash
+[root@lixiaohui ~]# dnf config-manager --enable rhel-9.0-for-x86_64-baseos-rpms
+[root@lixiaohui ~]# dnf repolist all
+repo id                               repo name                                        status
+rhel-9.0-for-x86_64-appstream-rpms    Red Hat Enterprise Linux 9.0 AppStream (dvd)     enabled
+rhel-9.0-for-x86_64-baseos-rpms       Red Hat Enterprise Linux 9.0 BaseOS (dvd)        enabled
+```
+
+### 添加 DNF 仓库
+
+```bash
+[root@lixiaohui ~]# dnf config-manager --add-repo="https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/"
+Adding repo from: https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/
+
+[root@lixiaohui ~]# cat /etc/yum.repos.d/dl.fedoraproject.org_pub_epel_9_Everything_x86_64_.repo
+[dl.fedoraproject.org_pub_epel_9_Everything_x86_64_]
+name=created by dnf config-manager from https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/
+baseurl=https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/
+enabled=1
+
+```
+
+默认情况下，命令添加仓库时，没有GPG公钥，这个需要自己手工下载到系统中，并在repo文件中添加，添加好之后的样例如下：
+
+```ini
+[EPEL]
+name=EPEL 9
+baseurl=https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-9
+```
+
+### DNF 安装软件
+
+```bash
+[root@lixiaohui ~]# dnf install httpd -y
+...
+Complete!
+```
+
+### 列出已安装的软件包
+
+```bash
+[root@lixiaohui ~]# dnf list installed
+```
+
+### 列出在仓库中可用的软件包
+
+```bash
+[root@lixiaohui ~]# dnf list available
+```
+
+### DNF 搜索软件包
+
+```bash
+[root@lixiaohui ~]# dnf search all 'web server'
+```
+
+### 查看软件包信息
+
+```bash
+[root@lixiaohui ~]# dnf info httpd
+```
+
+### 查询文件来源
+
+```bash
+[root@lixiaohui ~]# dnf provides /var/www/html
+```
+
+### 删除软件包
+
+```bash
+[root@lixiaohui ~]# dnf remove httpd
+```
+
+### 更新软件包
+
+**注意** 如果dnf update后面不加软件包名字，它将更新系统中的所有软件包，其中就包括内核
+
+```bash
+[root@lixiaohui ~]# dnf list kernel
+Last metadata expiration check: 0:05:40 ago on Sun 18 Feb 2024 08:20:06 AM EST.
+Installed Packages
+kernel.x86_64     5.14.0-70.13.1.el9_0        @System
+[root@lixiaohui ~]# uname -r
+5.14.0-70.13.1.el9_0.x86_64
+[root@lixiaohui ~]# uname -a
+Linux lixiaohui 5.14.0-70.13.1.el9_0.x86_64 #1 SMP PREEMPT Thu Apr 14 12:42:38 EDT 2022 x86_64 x86_64 x86_64 GNU/Linux
+
+```
+
+只更新特定软件包：
+
+```bash
+[root@lixiaohui ~]# dnf update httpd
+```
+
+
+### 列出软件包组
+
+dnf 命令也具有组的概念，即⼀起安装的相关软件集合。
+
+```bash
+[root@lixiaohui ~]# dnf grouplist
+Last metadata expiration check: 0:07:56 ago on Sun 18 Feb 2024 08:20:06 AM EST.
+Available Environment Groups:
+   Server with GUI
+   Server
+   Minimal Install
+   Workstation
+   Custom Operating System
+   Virtualization Host
+Available Groups:
+   Legacy UNIX Compatibility
+   Console Internet Tools
+   Container Management
+   Development Tools
+   .NET Development
+   Graphical Administration Tools
+   Headless Management
+   Network Servers
+   RPM Development Tools
+   Scientific Support
+   Security Tools
+   Smart Card Support
+   System Tools
+
+```
+
+### 查询软件包组信息
+
+这些集合提供的软件包或组可以列为 mandatory（安装该组时必须予以安装）、default（安装该组时通常会安装），或 optional（安装该组时不予安装，除⾮特别要求）
+
+```bash
+[root@lixiaohui ~]# dnf groupinfo "System Tools"
+Last metadata expiration check: 0:08:56 ago on Sun 18 Feb 2024 08:20:06 AM EST.
+Group: System Tools
+ Description: This group is a collection of various tools for the system, such as the client for connecting to SMB shares and tools to monitor network traffic.
+ Default Packages:
+   NetworkManager-libreswan
+   chrony
+   cifs-utils
+   libreswan
+   nmap
+   openldap-clients
+   samba-client
+   setserial
+   tigervnc
+   tmux
+   zsh
+ Optional Packages:
+   PackageKit-command-not-found
+   aide
+   autofs
+   bacula-client
+   chrpath
+   convmv
+   createrepo_c
+   environment-modules
+   freerdp
+   fuse
+   gpm
+
+```
+
+### 安装软件包组
+
+```bash
+[root@lixiaohui ~]#  dnf group install "RPM Development Tools" -y
+```
+
+## DNF 事务
+
+所有安装和删除事务的⽇志都记录在 /var/log/dnf.rpm.log 中。
+
+```bash
+[root@lixiaohui ~]# tail /var/log/dnf.rpm.log
+2024-02-18T08:32:46-0500 SUBDEBUG Installed: gdb-minimal-10.2-9.el9.x86_64
+2024-02-18T08:32:47-0500 SUBDEBUG Installed: efi-srpm-macros-6-2.el9_0.noarch
+2024-02-18T08:32:47-0500 SUBDEBUG Installed: dwz-0.14-3.el9.x86_64
+2024-02-18T08:32:47-0500 SUBDEBUG Installed: fonts-srpm-macros-1:2.0.5-7.el9.1.noarch
+2024-02-18T08:32:47-0500 SUBDEBUG Installed: go-srpm-macros-3.0.9-9.el9.noarch
+2024-02-18T08:32:47-0500 SUBDEBUG Installed: python-srpm-macros-3.9-52.el9.noarch
+2024-02-18T08:32:47-0500 SUBDEBUG Installed: redhat-rpm-config-194-1.el9.noarch
+2024-02-18T08:32:47-0500 SUBDEBUG Installed: elfutils-0.186-1.el9.x86_64
+2024-02-18T08:32:47-0500 SUBDEBUG Installed: rpm-build-4.16.1.3-12.el9_0.x86_64
+2024-02-18T08:32:47-0500 SUBDEBUG Installed: rpmdevtools-9.5-1.el9.noarch
+
+```
+
+### 查询DNF 历史
+
+```bash
+[root@lixiaohui ~]# dnf history
+ID     | Command line                                          | Date and time    | Action(s)      | Altered
+------------------------------------------------------------------------------------------------------------
+     3 | group install RPM Development Tools -y                | 2024-02-18 08:32 | Install        |   78
+     2 | install httpd -y                                      | 2024-02-18 08:20 | Install        |   10 EE
+     1 | -y install @base firewalld vim-enhanced gpm xkeyboard | 2022-05-18 07:12 | D, I           |  163 EE
+
+```
+
+### 撤销DNF事务
+
+从上面的查询来看，ID为2是安装了httpd软件包，撤销就是卸载的意思
+
+```bash
+[root@lixiaohui ~]# dnf history undo 2
+```
+
+### 重做DNF事务
+
+刚卸载了httpd，现在可以redo重做事务来再安装
+
+```bash
+[root@lixiaohui ~]# dnf history redo 2
+```
+
