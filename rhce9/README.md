@@ -30,7 +30,7 @@
 
 1. 恢复最开始`虚拟机自带`的快照，并使虚拟机开机
 
-2. 下载本仓库的所有资料，下载链接如下所示，下载完名字叫`rhel-master.zip`
+2. 下载本仓库的所有资料，下载链接如下所示，必须复制到浏览器进行下载，下载完名字叫`rhel-master.zip`
 
 ```bash
 https://gitee.com/cnlxh/rhel/repository/archive/master.zip
@@ -41,6 +41,35 @@ https://gitee.com/cnlxh/rhel/repository/archive/master.zip
 https://download.mobatek.net/2362023122033030/MobaXterm_Portable_v23.6.zip
 ```
 
+登录服务器步骤如下：
+
+解压并打开下载好的MobaXterm软件，点击左上角的 `session` 按钮
+
+![mobaxterm-session-on-gui](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/mobaxterm/mobaxterm-session-on-gui.png)
+
+选择左上角的 `SSH` ，然后确保Remote Host是 `172.25.254.250` , 已勾选Specify Username，并输入了 `kiosk` 用户名，端口号是默认的 `22` ,第一次连接会弹出窗口问你是否 `accept` ，点击 `accept` 即可
+
+![mobaxterm-session-ssh-create](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/mobaxterm/mobaxterm-session-ssh-create.png)
+
+此时会问你kiosk的密码是多少，请输入小写的 `redhat` ，输入的内容不可见，请确认输入正确，输入完毕后回车即可登录，在回车后，点击 `yes` 来保存密码
+
+![foundation-kiosk-password](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/mobaxterm/foundation-kiosk-password.png)
+
+切换到`root`用户，输入`Asimov`密码
+
+```bash
+su - root
+```
+
+4. 点击左侧的SFTP按钮，确认我们位于 `/home/kiosk/`，点击上传按钮，将我们下载好的 `rhel-master.zip` 上传到/home/kiosk下
+
+![mobaxterm-sftp](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/mobaxterm/mobaxterm-sftp.png)
+
+5. 将文件复制到`/root`中方便`root`用户使用，以下所有表述都表述为上传到`/root`中
+
+```bash
+cp /home/kiosk/rhel-master.zip /root
+```
 ## RHCSA 环境部署
 
 执行RHCSA 环境部署之前，必须已经完成准备工作
