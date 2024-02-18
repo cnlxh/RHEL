@@ -3607,3 +3607,74 @@ find /dev -type b
 find / -type f -links +1
 ```
 
+# 第十四章 分析服务器和获取支持
+
+## 分析和管理远程服务器
+
+## Web 控制台
+
+⾃红帽企业 Linux 7 起，除了最⼩安装外，所有安装中都默认安装 Web 控制台，直接启用即可
+
+```bash
+[root@lixiaohui ~]# systemctl enable --now cockpit
+
+```
+
+也可以用以下方式来安装
+
+```bash
+[root@lixiaohui ~]# dnf install cockpit
+
+```
+
+想要被外部访问到，需要在防火墙开通cockpit或者9090端口号
+
+```bash
+[root@lixiaohui ~]# firewall-cmd --add-service=cockpit --permanent
+[root@lixiaohui ~]# firewall-cmd --reload
+
+```
+
+访问控制台可以用http://IP:9090来访问
+
+如果root用户无法登录，可按照以下方式解除root用户限制，在编辑文件后，去掉root字样即可
+
+```bash
+[root@lixiaohui ~]# vim /etc/cockpit/disallowed-users
+[root@lixiaohui ~]# systemctl restart cockpit
+
+```
+
+## 创建sosreport
+
+sos 报告通常是红帽技术⽀持调查所报告问题的起点，⽤于收集红帽技术⽀持调查所报告问题所需的诊断信息。
+
+创建报告
+
+```bash
+[root@lixiaohui ~]# sos report
+Press ENTER to continue, or CTRL-C to quit.
+`ENTER`
+```
+
+如果你想限制一些隐私，可以尝试sos clean
+
+```bash
+[root@lixiaohui ~]# sos clean /var/tmp/sosreport-lixiaohui-2024-02-18-ectivgc.tar.xz
+```
+
+## 红帽智能分析insights-client
+
+```bash
+[root@lixiaohui ~]# dnf install insights-client
+[root@lixiaohui ~]# subscription-manager register --auto-attach
+[root@lixiaohui ~]# insights-client --register
+
+```
+
+注册完成后，打开：https://console.redhat.com/insights在 Web UI 的 Inventory 部分下可以看到系统。
+
+在同样的这个页面中，点击左侧的按钮，查看系统的分析和诊断信息
+
+
+
