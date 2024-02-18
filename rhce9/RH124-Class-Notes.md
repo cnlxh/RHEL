@@ -3356,3 +3356,254 @@ ID     | Command line                                          | Date and time  
 [root@lixiaohui ~]# dnf history redo 2
 ```
 
+# 第十三章 访问 Linux ⽂件系统
+
+## 识别⽂件系统和设备
+
+从RHEL 7开始默认的文件系统为XFS
+
+### 挂载点
+
+通过将⽂件系统挂载到空⽬录来访问⽂件系统的内容。该⽬录被称为挂载点，⽬录挂载后，使⽤ ls 命令列出该⽬录的内容。许多⽂件系统系统启动时⾃动挂载。
+
+### 块设备
+
+块设备是提供存储设备低级别访问权限的⽂件。必须对块设备进⾏可选分区，并创建⽂件系统，然后才能挂载该设备。
+
+/dev ⽬录存储 RHEL ⾃动为所有设备创建的块设备⽂件。在 RHEL 9 中，检测到的第⼀个SATA、SAS、SCSI 或 USB 硬盘驱动器被称为 /dev/sda 设备，第⼆个被称为 /dev/sdb 设备，以此类推。这些名称代表整个硬盘驱动器。
+
+### 磁盘分区
+
+分区本⾝就是块设备。例如，在第⼀ SATA 附加存储中，第⼀分区是 /dev/sda1 磁盘。同⼀存储的第⼆分区是 /dev/sda2 磁盘。
+
+### 逻辑卷
+
+整理磁盘和分区的另⼀种⽅式是利⽤逻辑卷管理 (LVM)。借助 LVM，可以将多个块设备聚合到⼀个卷组中。卷组中的磁盘空间分割成若⼲逻辑卷，它们的功能等同于物理磁盘上的分区。
+
+LVM 系统在创建时为卷组和逻辑卷分配名称。LVM 在 /dev ⽬录中创建⼀个名称与组名匹配的⽬录，然后在该新⽬录中创建⼀个与逻辑卷同名的符号链接。之后，可以挂载该逻辑卷⽂件。例如，如果存在⼀个 myvg 卷组和 mylv 逻辑卷，那么其逻辑卷的完整路径名是 /dev/myvg/mylv。
+
+### 文件系统查询
+
+1. 使⽤ df 命令可显⽰本地和远程⽂件系统设备的概览，其中包括总磁盘空间、已⽤磁盘空间、可⽤
+磁盘空间，以及占整个磁盘空间的百分⽐
+
+df 命令的 -h 或 -H 选项是⼈类可读选项，可以改善输出⼤⼩的可读性。-h 选项的报告单位是 KiB(1024进制)，⽽ -H 选项的报告单位是 SI 单位（1000进制）
+
+```bash
+[root@lixiaohui ~]# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        844M     0  844M   0% /dev
+tmpfs           888M     0  888M   0% /dev/shm
+tmpfs           355M  9.5M  346M   3% /run
+/dev/vda4       9.4G  1.8G  7.6G  19% /
+/dev/vda3       495M  160M  335M  33% /boot
+/dev/vda2       200M  7.0M  193M   4% /boot/efi
+tmpfs           178M     0  178M   0% /run/user/0
+[root@lixiaohui ~]# df -H
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        885M     0  885M   0% /dev
+tmpfs           931M     0  931M   0% /dev/shm
+tmpfs           373M   10M  363M   3% /run
+/dev/vda4        10G  1.9G  8.2G  19% /
+/dev/vda3       519M  168M  351M  33% /boot
+/dev/vda2       210M  7.4M  203M   4% /boot/efi
+tmpfs           187M     0  187M   0% /run/user/0
+
+```
+
+2. du 命令的 -h 和 -H 选项可以将输出转换为⼈类可读格式。du 命令以递归⽅式显⽰当前⽬录树中所有⽂件的⼤⼩。
+
+```bash
+[root@lixiaohui ~]# du /boot
+6132    /boot/efi/EFI/redhat
+1012    /boot/efi/EFI/BOOT
+7148    /boot/efi/EFI
+7164    /boot/efi
+4       /boot/loader/entries
+4       /boot/loader
+2340    /boot/grub2/fonts
+3344    /boot/grub2/i386-pc
+5692    /boot/grub2
+141348  /boot
+[root@lixiaohui ~]# du -h /boot
+6.0M    /boot/efi/EFI/redhat
+1012K   /boot/efi/EFI/BOOT
+7.0M    /boot/efi/EFI
+7.0M    /boot/efi
+4.0K    /boot/loader/entries
+4.0K    /boot/loader
+2.3M    /boot/grub2/fonts
+3.3M    /boot/grub2/i386-pc
+5.6M    /boot/grub2
+139M    /boot
+[root@lixiaohui ~]# du -s /boot
+141348  /boot
+[root@lixiaohui ~]# du -sh /boot
+139M    /boot
+
+```
+
+## 挂载和卸载⽂件系统
+
+### ⼿动挂载⽂件系统
+
+通过 mount 命令，root ⽤⼾可以⼿动挂载⽂件系统。mount 命令的第⼀个参数指定要挂载的⽂件系统。第⼆个参数指定在⽂件系统层次结构中⽤作挂载点的⽬录。
+
+可以使⽤ mount 命令，以下列⽅式之⼀挂载⽂件系统：
+
+1. 使⽤ /dev ⽬录中的设备⽂件名。
+2. 使⽤ UUID，即设备的通⽤唯⼀标识符。
+
+**注意** 如果使⽤ mount 命令挂载⽂件系统，之后⼜重新了启动系统，该⽂件系统不会⾃动重新挂载，需要手工挂载，在RH134课程中，我们将介绍如何处理此情况
+
+### 识别块设备
+
+使⽤ lsblk 命令可列出指定块设备或所有可⽤设备的详细信息
+
+```bash
+[root@lixiaohui ~]# lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+vda    252:0    0   10G  0 disk
+├─vda1 252:1    0    1M  0 part
+├─vda2 252:2    0  200M  0 part /boot/efi
+├─vda3 252:3    0  500M  0 part /boot
+└─vda4 252:4    0  9.3G  0 part /
+vdb    252:16   0    5G  0 disk
+└─vdb1 252:17   0    5G  0 part
+vdc    252:32   0    5G  0 disk
+vdd    252:48   0    5G  0 disk
+
+```
+
+### 使⽤分区名称挂载⽂件系统
+
+```bash
+[root@lixiaohui ~]# mount /dev/vdb1 /mnt
+[root@lixiaohui ~]# df -h | grep mnt
+/dev/vdb1       5.0G   68M  5.0G   2% /mnt
+
+```
+
+### 使⽤分区 UUID 挂载⽂件系统
+
+```bash
+[root@lixiaohui ~]# mount UUID="8599ac53-e0cc-4ca0-a3eb-233ccbcff9bd" /opt
+[root@lixiaohui ~]# df -h | grep opt
+/dev/vdb1       5.0G   68M  5.0G   2% /opt
+
+```
+
+### 卸载⽂件系统
+
+umount 命令使⽤挂载点作为参数，以卸载⽂件系统。
+
+```bash
+[root@lixiaohui ~]# umount /mnt
+
+```
+
+如果挂载的⽂件系统在使⽤之中，则⽆法卸载。要成功执⾏ umount 命令，所有进程必须停⽌访问挂载点下的数据。lsof 命令可列出所有打开的⽂件，以及访问该⽂件系统的进程。此列表可以帮助识别哪些进程正在阻⽌⽂件系统被成功卸载
+
+```bash
+[root@lixiaohui opt]# lsof | grep /opt
+bash       5883                          root  cwd       DIR             252,17         6        128 /opt
+lsof      32373                          root  cwd       DIR             252,17         6        128 /opt
+grep      32374                          root  cwd       DIR             252,17         6        128 /opt
+lsof      32375                          root  cwd       DIR             252,17         6        128 /opt
+[root@lixiaohui opt]# kill -9 5883
+
+```
+
+## 查找系统中的⽂件
+
+1. locate 命令搜索预⽣成索引中的⽂件名或⽂件路径，并即时返回结果。此命令速度较快，因为它是从 mlocate 数据库中
+查找这些信息的。但是，此数据库不会实时更新，需要频繁更新才能获得准确结果。
+
+先更新数据库
+
+```bash
+[root@lixiaohui ~]# updatedb
+
+```
+
+再查询
+
+-i 忽略大小写
+
+-n 限制返回的搜索结果数
+
+```bash
+[root@lixiaohui ~]# locate passwd
+/etc/passwd
+/etc/passwd
+/etc/pam.d/passwd
+...
+```
+
+
+2. find 命令通过解析整个⽂件系统层次结构来实时搜索⽂件，此命令速度⽐ locate 命令慢，但更加准确。此外，find 命令还可以根据⽂件名以外的条件搜索⽂件，例如⽂件的权限、⽂件、⼤⼩或修改时间。
+
+基于名称的查询
+
+```bash
+find / -name sshd_config
+find / -name '*.txt'
+find /etc -name '*pass*'
+find / -iname '*messages*'
+```
+
+基于用户或组的查询
+
+```bash
+find -user developer
+find -group developer
+find -uid 1000
+find -gid 1000
+find / -user root -group mail
+```
+
+基于特定权限的查询，权限前⾯带有 / 或 - 符号，以控制搜索结果
+
+1. 带有 / 符号将匹配权限集中为⽤⼾、组或其他⼈设置了⾄少⼀个权限的⽂件。具有r--r--r-- 权限的⽂件与 /222 权限不匹配，但与 rw-r--r-- 权限匹配。
+
+2. 权限前带有 - 符号表⽰权限的所有三个部分都必须匹配。对于上⼀⽰例，具有 rw-rw-rw- 权限的⽂件将符合条件
+
+```bash
+find /home -perm 764
+find /home -perm u=rwx,g=rw,o=r
+find /home -perm 764 -ls
+find /home -perm -324
+find /home -perm -u=wx,g=w,o=r
+find /home -perm /442
+find /home -perm /u=r,g=r,o=w
+find -perm -004
+find -perm -o=r
+find -perm -002
+find -perm -o=w
+```
+
+基于文件大小的查询
+
+```bash
+find -size 10M
+find -size +10G
+find -size -10k
+```
+
+基于时间的查询
+
+```bash
+find / -mmin 120
+find / -mmin +200
+find / -mmin -150
+```
+
+基于文件类型的查询
+
+```bash
+find /etc -type d
+find / -type l
+find /dev -type b
+find / -type f -links +1
+```
+
