@@ -22,6 +22,12 @@ servers=`cat /etc/rht | grep RHT_VMS= | cut -d = -f 2 |tr -d '"'`
 
 echo "Starting classroom, please wait a moment"
 rht-vmctl fullreset classroom -q &> /dev/null
+
+if [ $? -ne 0 ];then
+	echo "Cannot reset classroom on your Computer, Please run 'rht-vmctl reset classroom -q' manually"
+	exit 1
+fi
+
 while true;do ping -c1 classroom &> /dev/null;
 	if [ $? -ne 0 ];then
 		sleep 1;
