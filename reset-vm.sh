@@ -8,6 +8,9 @@
 # setting course
 read -p "Which course do you want to set: " course
 echo "Setting course to $course"
+rht-vmctl poweroff classroom -q &> /dev/null
+rht-vmctl poweroff all -q &> /dev/null
+
 rht-clearcourse 0 &> /dev/null
 rht-setcourse $course &> /dev/null
 if [ $? -ne 0 ];then
