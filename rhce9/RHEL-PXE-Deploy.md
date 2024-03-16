@@ -189,6 +189,7 @@ HTTP服务器用于在网络安装期间的光盘资料托管，其中ks.cfg是k
 ```bash
 [root@lxh-server ~]# mount /dev/cdrom /mnt
 [root@lxh-server ~]# cp -a /mnt/* /var/www/html/
+[root@lxh-server ~]# cp /mnt/.discinfo /mnt/.treeinfo /var/www/html/
 [root@lxh-server ~]# cp -a ks.cfg /var/www/html/
 [root@lxh-server ~]# restorecon -RvF /var/www/
 ```
