@@ -250,7 +250,7 @@ label linux
   menu label ^Install Red Hat Enterprise Linux 9.3
   menu default
   kernel vmlinuz
-  append initrd=initrd.img inst.stage2=http://192.168.8.200 inst.ks=http://192.168.8.200/ks.cg quiet
+  append initrd=initrd.img inst.stage2=http://192.168.8.200 inst.ks=http://192.168.8.200/ks.cfg quiet
 ```
 ```bash
 [root@lxh-server tftpboot]# chmod 755 /var/lib/tftpboot -R
@@ -271,7 +271,7 @@ label linux
 set default="0"
 ...
 menuentry 'Install Red Hat Enterprise Linux 9.3' --class fedora --class gnu-linux --class gnu --class os {
-        linuxefi vmlinuz inst.stage2=http://192.168.8.200 inst.ks=http://192.168.8.200/ks.cg quiet
+        linuxefi vmlinuz inst.stage2=http://192.168.8.200 inst.ks=http://192.168.8.200/ks.cfg quiet
         initrdefi initrd.img
 }
 ```
