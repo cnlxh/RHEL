@@ -350,12 +350,12 @@ function podman-q14 {
 }
 function sudo-q15 {
     q15score=0
-    if servera_sshpasscmd $serveraip "grep ^'%wheel' /etc/sudoers" | grep -q NOPASSWD; then
+    if servera_sshpasscmd $serveraip "grep ^'%sysmgrs' /etc/sudoers" | grep -q NOPASSWD; then
         score=$(expr $score + 1 )
         q15score=$(expr $q15score + 2 )
         pass && echo "Q15 添加sudo免密操作"
     else
-        fail && echo "Q15 wheel组的NOPASSWD没配置好"
+        fail && echo "Q15 sysmgrs组的NOPASSWD没配置好"
     fi
 
 }
