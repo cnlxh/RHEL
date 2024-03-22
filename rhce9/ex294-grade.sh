@@ -615,6 +615,36 @@ q17score=0
         pass && echo "Q17 配置 cron 作业"
     fi       
 }
+
+function timesyncrole {
+q18score=0
+
+    if sshpasscmd bastion 'dnf list installed' | grep -qw 'rhel-system-roles';then
+         score=$(expr $score + 2 )
+         q18score=$(expr $q18score + 2 )        
+    else
+        fail && echo "Q18 未安装系统角色软件包"
+    fi
+    ansible-navigator run -m stdout timesync.yml --syntax-check &> /dev/null
+    if [ $? -eq 0 ];then
+         score=$(expr $score + 2 )
+         q18score=$(expr $q18score + 2 )        
+    else
+        fail && echo "Q18 timesync.yml语法错误"
+    fi
+    for host in servera serverb serverc serverd workstation;do
+        if ansible $host -m shell -a 'chronyc sources' 2> /dev/null | grep -q '172.25.254.254';then
+           score=$(expr $score + 2 )
+           q18score=$(expr $q18score + 2 )
+        else
+           echo "Q18 "$host"执行chronyc sources后, 未发现172.25.254.254"
+        fi
+    done
+    if [ $q18score -gt 5 ];then
+        pass && echo "Q18 配置 cron 作业"
+    fi       
+}
+
 # configure vdb
 
 function prepare_servera {
@@ -849,6 +879,8 @@ ssh greg@bastion 'cd /home/greg/ansible/ && ansible-navigator run -m stdout /hom
 ssh greg@bastion 'cd /home/greg/ansible/ && ansible-navigator run -m stdout /home/greg/ansible/hwreport.yml'
 ssh greg@bastion 'cd /home/greg/ansible/ && ansible-navigator run -m stdout /home/greg/ansible/users.yml'
 ssh greg@bastion 'cd /home/greg/ansible/ && ansible-navigator run -m stdout /home/greg/ansible/cron.yml'
+ssh greg@bastion 'cd /home/greg/ansible/ && ansible-navigator run -m stdout /home/greg/ansible/timesync.yml'
+
 
 echo
 echo
@@ -873,3 +905,4 @@ create_vault
 create_user
 update_vault
 cronfile
+timesyncrole
