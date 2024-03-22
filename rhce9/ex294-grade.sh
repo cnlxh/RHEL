@@ -532,7 +532,7 @@ q14score=0
     else
         fail && echo "Q14 ansible.cfg中未检测到vault_password_file参数"
     fi
-    if sshpasscmd bastion 'cd /home/greg/ansible/ && ansible-vault view /home/greg/ansible/locker.yml' &> /dev/null;then
+    if sshpasscmd bastion 'cd /home/greg/ansible/ && timeout 10 ansible-vault view /home/greg/ansible/locker.yml' &> /dev/null;then
         score=$(expr $score + 2 )
         q14score=$(expr $q14score + 2 )
     else
@@ -630,7 +630,7 @@ q18score=0
          score=$(expr $score + 2 )
          q18score=$(expr $q18score + 2 )        
     else
-        fail && echo "Q18 timesync.yml语法错误"
+        fail && echo "Q18 timesync.yml不存在或语法错误"
     fi
     for host in servera serverb serverc serverd workstation;do
         if ansible $host -m shell -a 'chronyc sources' 2> /dev/null | grep -q '172.25.254.254';then
@@ -640,8 +640,8 @@ q18score=0
            echo "Q18 "$host"执行chronyc sources后, 未发现172.25.254.254"
         fi
     done
-    if [ $q18score -gt 5 ];then
-        pass && echo "Q18 配置 cron 作业"
+    if [ $q18score -gt 13 ];then
+        pass && echo "Q18 配置 timesync 角色"
     fi       
 }
 
