@@ -209,7 +209,7 @@ function prepare_serverb {
 ssh root@serverb 'echo lixiaohui | passwd --stdin root' &> /dev/null
 }
 
-function lvm-q18 {
+function lvm-q19 {
     ssh root@$serverbip "wipefs -a /dev/vdb" &>/dev/null
     ssh root@$serverbip "parted /dev/vdb --script mklabel msdos" &>/dev/null
     ssh root@$serverbip "parted /dev/vdb mkpart primary 2048s 501MiB" &>/dev/null
@@ -220,38 +220,38 @@ function lvm-q18 {
     ssh root@$serverbip 'echo "/dev/myvol/vo /reports ext4 defaults 0 0" >> /etc/fstab'
     ssh root@$serverbip mount -a
     if ! ssh root@$serverbip lsblk | grep -q vdb1; then
-        fail && echo "Q18 vdb1 不存在"
+        fail && echo "Q19 vdb1 不存在"
     elif ! ssh root@$serverbip "lvs | grep -q vo"; then
-        fail && echo "Q18 vo lvm 不存在"
+        fail && echo "Q19 vo lvm 不存在"
     elif ! ssh root@$serverbip blkid | grep myvol | grep -q "ext4"; then
-        fail && echo "Q18 vo的格式化不是ext4"
+        fail && echo "Q19 vo的格式化不是ext4"
     elif ! ssh root@$serverbip mount -l | grep -q "reports"; then
-        fail && echo "Q18 reports没挂载成功" 
+        fail && echo "Q19 reports没挂载成功" 
     else
-        pass && echo "Q18 调整逻辑卷大小"
+        pass && echo "Q19 调整逻辑卷大小"
     fi
 }
 
-function swap-q19 {
+function swap-q20 {
     ssh root@$serverbip parted /dev/vdb --script mkpart primary 501MiB 1024MiB &>/dev/null
     ssh root@$serverbip mkswap /dev/vdb2 &>/dev/null
     ssh root@$serverbip 'echo "/dev/vdb2 swap swap defaults 0 0" >> /etc/fstab' &>/dev/null
     ssh root@$serverbip swapon -a
     if ! ssh root@$serverbip lsblk | grep -q vdb2; then
-        fail && echo "Q19 vdb2 不存在"
+        fail && echo "Q20 vdb2 不存在"
     elif ! ssh root@$serverbip "swapon -s | grep -q vdb2"; then
-        fail && echo "Q19 vdb2 的swap没激活"
+        fail && echo "Q20 vdb2 的swap没激活"
     else
-        pass && echo "Q19 添加交换分区"
+        pass && echo "Q20 添加交换分区"
     fi
 }
 
-function tuned-q21 {
+function tuned-q22 {
     ssh root@$serverbip tuned-adm profile desktop &>/dev/null
     if ! ssh root@$serverbip tuned-adm active | grep -q desktop; then
         fail && echo "tuned 设置失败"
     else
-        pass && echo "Q21 配置系统调优"
+        pass && echo "Q22 配置系统调优"
     fi
 }
 
@@ -348,12 +348,11 @@ for host in classroom servera serverb;do
     ssh root@$host "echo flectrag | passwd --stdin root"  &> /dev/null
 done
 
-
+pass && echo "题号不连续是因为有些题目无需做测试准备"
 prepare_network_hostsfile
 network-q1
 repository-q2
 selinux-q3
-pass && echo "以下题号无需设置环境: Q4-Q6,Q9,Q15-Q17,Q20"
 ntp_set
 autofs-q8
 findfile-q10
