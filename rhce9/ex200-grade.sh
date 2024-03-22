@@ -359,61 +359,74 @@ function sudo-q15 {
     fi
 
 }
-function root-password-q16 {
+
+function umask-q16 {
     q16score=0
+    if sshpass -p flectrag ssh -A -g -o StrictHostKeyChecking=no -o PreferredAuthentications=password manalo@$serveraip "umask" 2> /dev/null | grep -q 0222; then
+        score=$(expr $score + 1 )
+        q16score=$(expr $q16score + 2 )
+        pass && echo "Q16 设置用户的默认权限"
+    else
+        fail && echo "Q16 manalo用户不存在或者umask不是0222"
+    fi
+
+}
+
+function root-password-q17 {
+    q17score=0
     if sshpass -p flectrag ssh -A -g -o StrictHostKeyChecking=no -o PreferredAuthentications=password root@$serverbip "ls" 2> /dev/null; then
         score=$(expr $score + 2 )
-        q15score=$(expr $q16score + 2 )
-        pass && echo "Q16 设置 root 密码"
+        q17score=$(expr $q17score + 2 )
+        pass && echo "Q17 设置 root 密码"
     else
-        fail && echo "Q16 serverb的root密码不是flectrag,正式考试中后续题目算作0分"
+        fail && echo "Q17 serverb的root密码不是flectrag,正式考试中后续题目算作0分"
         exit 1
     fi
 
 }
-function repository-q17 {
-    score17=0
+function repository-q18 {
+    score18=0
     if servera_sshpasscmd $serverbip "dnf repoinfo 2>/dev/null | grep -q http://content/rhel9.0/x86_64/dvd/BaseOS" 2> /dev/null; then
         score=$(expr $score + 1 )
-        score17=$(expr $score17 + 2 )
+        score18=$(expr $score18 + 2 )
     else
-        fail && echo "Q17 BaseOS 不存在"
+        fail && echo "Q18 BaseOS 不存在"
     fi
     if servera_sshpasscmd $serverbip "dnf repoinfo 2>/dev/null | grep -q http://content/rhel9.0/x86_64/dvd/AppStream" 2> /dev/null; then
         score=$(expr $score + 1 )
-        score17=$(expr $score17 + 2 )
+        score18=$(expr $score18 + 2 )
     else
-        fail && echo "Q17 AppStream 不存在"
+        fail && echo "Q18 AppStream 不存在"
     fi
     if servera_sshpasscmd $serverbip 'dnf install ftp -y' &> /dev/null; then
         score=$(expr $score + 1 )
-        score17=$(expr $score17 + 2 )
+        score18=$(expr $score18 + 2 )
     else
-        fail && echo "Q17 无法从你的仓库中安装软件"
+        fail && echo "Q18 无法从你的仓库中安装软件"
     fi
-    if [ $score17 -gt 5 ]; then
-        pass && echo "Q17 配置您的系统以使用默认存储库"
+    if [ $score18 -gt 5 ]; then
+        pass && echo "Q18 配置您的系统以使用默认存储库"
     fi
 
 
 }
 
-function lvm-q18 {
+function lvm-q19 {
 
 size=$(ssh root@$serverbip lvs /dev/myvol/vo 2> /dev/null --noheadings --units M --nosuffix -o lv_size | tr -d ' ' | cut -d . -f 1 )
-q18score=0
+q19score=0
 if [ $size -gt 200 2> /dev/null ]; then
     score=$(expr $score + 2 )
-    pass && echo "Q18 调整逻辑卷大小"
+    pass && echo "Q19 调整逻辑卷大小"
 else
-    fail && echo "Q18 调整逻辑卷大小没有成功"
+    fail && echo "Q19 调整逻辑卷大小没有成功"
 fi
 }
 
-function swap-q19 {
+function swap-q20 {
 
 sizes=$(ssh root@$serverbip lsblk | grep -i swap 2> /dev/null | awk '{print $4}' | cut -d M -f 1)
-q19score=0
+q20score=0
 found=0
 for size in $sizes; do
   if [ "$size" -eq 512 ]; then
@@ -422,46 +435,46 @@ for size in $sizes; do
 done
 if [ "$found" -eq 1 2> /dev/null ]; then
   score=$(expr $score + 2 )
-  pass && echo "Q19 添加交换分区"
+  pass && echo "Q20 添加交换分区"
 else
-  fail && echo "Q19 未找到512大小的swap"
+  fail && echo "Q20 未找到512大小的swap"
 fi
 
 }
 
-function create-lvm-q20 {
-    q20score=0
+function create-lvm-q21 {
+    q21score=0
     if servera_sshpasscmd $serverbip "vgdisplay qagroup | grep 'PE Size' | grep -q 16" 2> /dev/null; then
         score=$(expr $score + 2 )
-        q20score=$(expr $q20score + 2 )
+        q21score=$(expr $q21score + 2 )
     else
-        fail && echo "Q20 qagroup VG不存在或者PE不是16M"
+        fail && echo "Q21 qagroup VG不存在或者PE不是16M"
     fi
     if servera_sshpasscmd $serverbip "lvs" | grep -qE '960|qa' &> /dev/null; then
         score=$(expr $score + 2 )
-        q20score=$(expr $q20score + 2 )
+        q21score=$(expr $q21score + 2 )
     else
-        fail && echo "Q20 qa LV不存在或者不是60个PE"
+        fail && echo "Q21 qa LV不存在或者不是60个PE"
     fi
     if servera_sshpasscmd $serverbip "blkid" | grep qagroup | grep -q vfat &> /dev/null; then
         score=$(expr $score + 2 )
-        q20score=$(expr $q20score + 2 )
+        q21score=$(expr $q21score + 2 )
     else
-        fail && echo "Q20 qa LV不存在或者不是vfat格式化"
+        fail && echo "Q21 qa LV不存在或者不是vfat格式化"
     fi
-    if [ $q20score -gt 5 ]; then
-        pass && echo "Q20 创建逻辑卷"
+    if [ $q21score -gt 5 ]; then
+        pass && echo "Q21 创建逻辑卷"
     fi
 }
 
-function tuned-q21 {
-    q21score=0
+function tuned-q22 {
+    q22score=0
     if servera_sshpasscmd $serverbip "tuned-adm active" 2> /dev/null | grep -q virtual-guest; then
         score=$(expr $score + 2 )
-        q21score=$(expr $q21score + 2 )
-        pass && echo "Q21 配置系统调优"
+        q22score=$(expr $q22score + 2 )
+        pass && echo "Q22 配置系统调优"
     else
-        fail && echo "Q21 virtual-guest不是当前值"
+        fail && echo "Q22 virtual-guest不是当前值"
    fi
 
 }
@@ -506,24 +519,28 @@ tar-q12
 podman-q13
 podman-q14
 sudo-q15
-root-password-q16
-repository-q17
-lvm-q18
-swap-q19
-create-lvm-q20
-tuned-q21
-echo
-echo
-echo '===================================================================='
+umask-q16
+root-password-q17
+repository-q18
+lvm-q19
+swap-q20
+create-lvm-q21
+tuned-q22
 echo
 echo
 
-pass_score=`echo "scale=0; 53 * 0.7"|bc -l|cut -d'.' -f1`
 
-if [ $score -gt $pass_score ];then
-  pass && echo "本试卷满分为53分, 你本次得分为: $score 分，通过了考试" 
-else
-  fail && echo "本试卷满分为53分, 你本次得分为: $score 分，暂未通过考试，加油哦，看好你" 
-fi
-echo
-echo
+# echo '===================================================================='
+# echo
+# echo
+
+# pass_score=`echo "scale=0; 53 * 0.7"|bc -l|cut -d'.' -f1`
+
+# if [ $score -gt $pass_score ];then
+#   pass && echo "本试卷满分为53分, 你本次得分为: $score 分，通过了考试" 
+# else
+#   fail && echo "本试卷满分为53分, 你本次得分为: $score 分，暂未通过考试，加油哦，看好你" 
+# fi
+# echo
+# echo
+

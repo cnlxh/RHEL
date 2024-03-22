@@ -22,7 +22,10 @@ function fail {
 }
 function prepare_network_hostsfile {
 ssh root@servera "nmcli connection modify 'Wired connection 2' ipv4.method manual ipv4.addresses 172.25.250.111/24 ipv4.gateway 172.25.250.254 ipv4.dns 172.25.250.220 connection.autoconnect yes" &> /dev/null
+ssh root@servera "nmcli connection modify 'Wired connection 2' con-name 'Do-not-modify'" &> /dev/null
 ssh root@servera "nmcli connection down 'Wired connection 2';nmcli connection up 'Wired connection 2'" &> /dev/null
+ssh root@servera "nmcli connection down 'Do-not-modify';nmcli connection up 'Do-not-modify'" &> /dev/null
+
 sed -i 's/^172.25.250.10/172.25.250.100/g' /etc/hosts &> /dev/null
 cat > /tmp/hosts <<EOF
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
@@ -42,9 +45,10 @@ function network-q1 {
             break
         fi
     done
-    ssh root@servera "nmcli connection modify 'Wired connection 1' ipv4.method auto ipv4.addresses 1.1.1.1/24 ipv4.gateway 1.1.1.1 ipv4.dns 1.1.1.1 connection.autoconnect no" &> /dev/null
+    ssh root@$serveraip "nmcli connection modify 'Wired connection 1' ipv4.method auto ipv4.addresses 1.1.1.1/24 ipv4.gateway 1.1.1.1 ipv4.dns 1.1.1.1 connection.autoconnect no" &> /dev/null
+    ssh root@$serveraip "nmcli connection down 'Wired connection 1 -w 5'" &> /dev/null
     ssh root@$serveraip "hostnamectl hostname lixiaohui" &> /dev/null
-    if `ssh root@$serveraip "nmcli connection show 'Wired connection 2'" | grep -q '172.25.250.111'`;then
+    if `ssh root@$serveraip "nmcli connection show 'Do-not-modify'" | grep -q '172.25.250.111'`;then
         pass && echo "Q1 网络设置成功"
     else
         fail && echo "Q1 网络设置失败"
@@ -362,6 +366,6 @@ podman-q13
 podman-q14
 servera-netowrk-auto
 prepare_serverb
-lvm-q18
-swap-q19
-tuned-q21
+lvm-q19
+swap-q20
+tuned-q22
