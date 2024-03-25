@@ -8,6 +8,7 @@
 serveraip=172.25.250.111
 serverbip=172.25.250.11
 
+count=0
 score=0
 ssh root@$serveraip "sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config"
 ssh root@$serveraip 'systemctl restart sshd'
@@ -61,6 +62,7 @@ function network-q1 {
         fail && echo "Q1 网关不是172.25.250.254"
     fi
     if [ $score1 -gt 7 ]; then
+        count=$(expr $count + 1 )
         pass && echo "Q1 配置网络设置"
     fi
 }
@@ -85,6 +87,7 @@ function repository-q2 {
         fail && echo "Q2 无法从你的仓库中安装软件"
     fi
     if [ $score2 -gt 5 ]; then
+        count=$(expr $count + 1 )
         pass && echo "Q2 配置您的系统以使用默认存储库"
     fi
 
@@ -124,6 +127,7 @@ function selinux-q3 {
     fi
 
     if [ $score3 -gt 7 ]; then
+        count=$(expr $count + 1 )
         pass && echo "Q3 调试 SELinux"
     fi
 }
@@ -164,6 +168,7 @@ function create-user-q4 {
         fail && echo "Q4 natasha、harry等用户密码不是flectrag"
     fi
     if [ $score4 -gt 9 ]; then
+        count=$(expr $count + 1 )   
         pass && echo "Q4 创建用户账号"
     fi
 
@@ -172,7 +177,8 @@ function cron-q5 {
     score5=0
     if servera_sshpasscmd $serveraip "crontab -u harry -l 2> /dev/null | grep -q '23 14'"; then
         score=$(expr $score + 1 )
-        score5=$(expr $score5 + 2 )        
+        score5=$(expr $score5 + 2 )
+        count=$(expr $count + 1 )     
         pass && echo "Q5 配置Cron作业"
     else
         fail && echo "Q5 harry用户不存在或crontab的时间设置不正确"
@@ -206,6 +212,7 @@ function create-folder-q6 {
         fail && echo "Q6 /home/managers权限不对"
     fi
     if [ $score6 -gt 7 ]; then
+        count=$(expr $count + 1 )
         pass && echo "Q6 创建协作目录"
     fi
 }
@@ -214,6 +221,7 @@ function configure-ntp-q7 {
     if servera_sshpasscmd $serveraip "chronyc sources" | grep -qE "materials|classroom"; then
         score=$(expr $score + 1 )
         q7score=$(expr $q7score + 2 )
+        count=$(expr $count + 1 )
         pass && echo "Q7 配置 NTP"
     else
         fail && echo "Q7 materials|classroom其中一项没有配置成功"
@@ -241,6 +249,7 @@ function autofs-q8 {
         fail && echo "Q8 remoteuser1用户无法登录或没有写入权限"
     fi
     if [ $q8score -gt 5 ]; then
+        count=$(expr $count + 1 )
         pass && echo "Q8 配置 autofs"
     fi
 }
@@ -249,6 +258,7 @@ function configure-user-q9 {
     if servera_sshpasscmd $serveraip "id manalo" 2> /dev/null | grep -q 3533; then
         score=$(expr $score + 1 )
         q9score=$(expr $q9score + 2 )
+        count=$(expr $count + 1 )
         pass && echo "Q9 配置用户帐号"
     else
         fail && echo "Q9 manalo uid不是3533"
@@ -270,6 +280,7 @@ function findfile-q10 {
         fail && echo "Q10 /root/findfiles中的文件不属于jacques"
     fi
     if [ $q10score -gt 3 ]; then
+        count=$(expr $count + 1 )
         pass && echo "Q10 查找文件"
     fi
 
@@ -289,6 +300,7 @@ function findchar-q11 {
         fail && echo "Q11 /root/list中没有ng行"
     fi
     if [ $q11score -gt 3 ]; then
+        count=$(expr $count + 1 )
         pass && echo "Q11 查找字符串"
     fi
 
@@ -298,6 +310,7 @@ function tar-q12 {
     if servera_sshpasscmd $serveraip "file /root/backup.tar" | grep -q bzip2; then
         score=$(expr $score + 1 )
         q12score=$(expr $q12score + 2 )
+        count=$(expr $count + 1 )
         pass && echo "Q12 创建存档"
     else
         fail && echo "Q12 /root/backup.tar不存在或不是bzip2数据"
@@ -308,6 +321,7 @@ function podman-q13 {
     if sshpass -p flectrag ssh -A -g -o StrictHostKeyChecking=no wallah@$serveraip podman images 2> /dev/null | grep -q pdf; then
         score=$(expr $score + 1 )
         q13score=$(expr $q13score + 2 )
+        count=$(expr $count + 1 )
         pass && echo "Q13 创建一个容器镜像"
     else
         fail && echo "Q13 本地没有pdf镜像"
@@ -344,6 +358,7 @@ function podman-q14 {
     fi
       
     if [ $q14score -gt 7 ]; then
+        count=$(expr $count + 1 )
         pass && echo "Q14 将容器配置为服务"
     fi
 
@@ -353,6 +368,7 @@ function sudo-q15 {
     if servera_sshpasscmd $serveraip "grep ^'%sysmgrs' /etc/sudoers" | grep -q NOPASSWD; then
         score=$(expr $score + 1 )
         q15score=$(expr $q15score + 2 )
+        count=$(expr $count + 1 )
         pass && echo "Q15 添加sudo免密操作"
     else
         fail && echo "Q15 sysmgrs组的NOPASSWD没配置好"
@@ -365,18 +381,37 @@ function umask-q16 {
     if sshpass -p flectrag ssh -A -g -o StrictHostKeyChecking=no -o PreferredAuthentications=password manalo@$serveraip "umask" 2> /dev/null | grep -q 0222; then
         score=$(expr $score + 1 )
         q16score=$(expr $q16score + 2 )
-        pass && echo "Q16 设置用户的默认权限"
+        count=$(expr $count + 1 )
+        pass && echo "Q16A 设置用户的默认权限"
     else
-        fail && echo "Q16 manalo用户不存在或者umask不是0222"
+        fail && echo "Q16A manalo用户不存在或者umask不是0222"
     fi
 
 }
 
+function alias-q16b {
+    q16bscore=0
+    sshpass -p flectrag ssh -A -g -o StrictHostKeyChecking=no -o PreferredAuthentications=password natasha@$serveraip "grep -q 'This is a rhcsa' /home/natasha/.bashrc"
+    if [ $? -eq 0 ]; then
+        score=$(expr $score + 1 )
+        q16bscore=$(expr $q16bscore + 2 )
+        count=$(expr $count + 1 )
+        pass && echo "Q16B 配置应用"
+    else
+        fail && echo "Q16B 未在natasha用户的.bashrc中发现alias定义"
+    fi
+
+}
+
+
+
+
 function root-password-q17 {
     q17score=0
     if sshpass -p flectrag ssh -A -g -o StrictHostKeyChecking=no -o PreferredAuthentications=password root@$serverbip "ls" 2> /dev/null; then
-        score=$(expr $score + 2 )
+        score=$(expr $score + 1 )
         q17score=$(expr $q17score + 2 )
+        count=$(expr $count + 1 )
         pass && echo "Q17 设置 root 密码"
     else
         fail && echo "Q17 serverb的root密码不是flectrag,正式考试中后续题目算作0分"
@@ -405,6 +440,7 @@ function repository-q18 {
         fail && echo "Q18 无法从你的仓库中安装软件"
     fi
     if [ $score18 -gt 5 ]; then
+        count=$(expr $count + 1 )
         pass && echo "Q18 配置您的系统以使用默认存储库"
     fi
 
@@ -416,7 +452,8 @@ function lvm-q19 {
 size=$(ssh root@$serverbip lvs /dev/myvol/vo 2> /dev/null --noheadings --units M --nosuffix -o lv_size | tr -d ' ' | cut -d . -f 1 )
 q19score=0
 if [ $size -gt 200 2> /dev/null ]; then
-    score=$(expr $score + 2 )
+    score=$(expr $score + 1 )
+    count=$(expr $count + 1 )
     pass && echo "Q19 调整逻辑卷大小"
 else
     fail && echo "Q19 调整逻辑卷大小没有成功"
@@ -434,7 +471,8 @@ for size in $sizes; do
   fi
 done
 if [ "$found" -eq 1 2> /dev/null ]; then
-  score=$(expr $score + 2 )
+  score=$(expr $score + 1 )
+  count=$(expr $count + 1 )
   pass && echo "Q20 添加交换分区"
 else
   fail && echo "Q20 未找到512大小的swap"
@@ -445,24 +483,25 @@ fi
 function create-lvm-q21 {
     q21score=0
     if servera_sshpasscmd $serverbip "vgdisplay qagroup | grep 'PE Size' | grep -q 16" 2> /dev/null; then
-        score=$(expr $score + 2 )
+        score=$(expr $score + 1 )
         q21score=$(expr $q21score + 2 )
     else
         fail && echo "Q21 qagroup VG不存在或者PE不是16M"
     fi
     if servera_sshpasscmd $serverbip "lvs" | grep -qE '960|qa' &> /dev/null; then
-        score=$(expr $score + 2 )
+        score=$(expr $score + 1 )
         q21score=$(expr $q21score + 2 )
     else
         fail && echo "Q21 qa LV不存在或者不是60个PE"
     fi
     if servera_sshpasscmd $serverbip "blkid" | grep qagroup | grep -q vfat &> /dev/null; then
-        score=$(expr $score + 2 )
+        score=$(expr $score + 1 )
         q21score=$(expr $q21score + 2 )
     else
         fail && echo "Q21 qa LV不存在或者不是vfat格式化"
     fi
     if [ $q21score -gt 5 ]; then
+        count=$(expr $count + 1 )
         pass && echo "Q21 创建逻辑卷"
     fi
 }
@@ -470,8 +509,9 @@ function create-lvm-q21 {
 function tuned-q22 {
     q22score=0
     if servera_sshpasscmd $serverbip "tuned-adm active" 2> /dev/null | grep -q virtual-guest; then
-        score=$(expr $score + 2 )
+        score=$(expr $score + 1 )
         q22score=$(expr $q22score + 2 )
+        count=$(expr $count + 1 )
         pass && echo "Q22 配置系统调优"
     else
         fail && echo "Q22 virtual-guest不是当前值"
@@ -520,6 +560,7 @@ podman-q13
 podman-q14
 sudo-q15
 umask-q16
+alias-q16b
 root-password-q17
 repository-q18
 lvm-q19
@@ -530,17 +571,18 @@ echo
 echo
 
 
-# echo '===================================================================='
-# echo
-# echo
+echo '===================================================================='
+echo
+echo
+
 
 # pass_score=`echo "scale=0; 53 * 0.7"|bc -l|cut -d'.' -f1`
 
-# if [ $score -gt $pass_score ];then
-#   pass && echo "本试卷满分为53分, 你本次得分为: $score 分，通过了考试" 
-# else
-#   fail && echo "本试卷满分为53分, 你本次得分为: $score 分，暂未通过考试，加油哦，看好你" 
-# fi
-# echo
-# echo
+if [ $count -gt 16 ];then
+  pass && echo "你本次已至少获得70%的分数, 通过了模拟测试" 
+else
+  fail && echo "你本次尚未获得70%的分数, 暂未通过考试, 加油哦, 看好你" 
+fi
+echo
+echo
 
