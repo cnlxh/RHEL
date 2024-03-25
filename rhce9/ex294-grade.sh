@@ -6,7 +6,7 @@
 # self test only, please do not use it on production or others
 
 score=0
-
+count=0
 # prepare user and ssh key
 
 function sshpasscmd {
@@ -94,6 +94,7 @@ q1score=0
         fail && echo "Q1 prod 不是webservers 的子组"
     fi
     if [ $q1score -gt 19 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q1 安装和配置 Ansible"
     fi
 }
@@ -160,6 +161,7 @@ for host in servera serverb serverc serverd workstation;do
     fi
 done
     if [ $q2score -gt 89 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q2 配置您的系统以使用默认存储库"
     fi
 }
@@ -181,6 +183,7 @@ done
          fail && echo "Q3 在dev主机组中未检测到已安装RPM Development Tools软件包组"
     fi
     if [ $q3score -gt 5 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q3 安装软件包"
     fi
 }
@@ -202,6 +205,7 @@ q4score=0
         fi
     done
     if [ $q4score -gt 11 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q4 使用 RHEL 系统角色"
     fi
 }
@@ -227,6 +231,7 @@ function configure_collection {
         fail && echo "Q5 未在/home/greg/ansible/mycollection找到rhel_system_roles"
     fi
     if [ $q5score -gt 5 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q5 配置conllection"
     fi
 }
@@ -246,6 +251,7 @@ function install_role {
     fi
     
     if [ $q6score -gt 3 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q6 使用 Ansible Galaxy 安装角色"
     fi      
 }
@@ -276,6 +282,7 @@ function create_apache_role {
         fail && echo "Q7 访问serverc返回的内容不包含serverc.lab.example.com或172.25.250.12"
     fi
     if [ $q7score -gt 3 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q7 创建和使用角色"
     fi
 }
@@ -302,6 +309,7 @@ function use_galaxy_role {
          rm -rf /tmp/q8.txt
     fi
     if [ $q8score -gt 5 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q8 从 Ansible Galaxy 使用角色"
     fi
 }
@@ -356,6 +364,7 @@ function create_lv {
         fail && echo "Q9 serverc上的/dev/research/data不存在, 或不是ext4格式"
     fi
     if [ $q9score -gt 15 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q9 创建和使用逻辑卷"
     fi
 }
@@ -394,6 +403,7 @@ function create_hosts_file {
     fi
 
     if [ $q10score -gt 9 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q10 生成主机文件"
     fi    
 }
@@ -425,6 +435,7 @@ q11score=0
       fail && echo "Q11 serverc上/etc/issue中没有发现Production"
     fi
     if [ $q11score -gt 7 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q11 修改文件内容"
     fi   
 }
@@ -462,6 +473,7 @@ q12score=0
         fail && echo "Q12 http://172.25.250.9/webdev/ 无法访问或返回内容不是Development"
     fi
     if [ $q12score -gt 9 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q12 创建 Web 内容目录"
     fi   
 }
@@ -520,6 +532,7 @@ q13score=0
         fail && echo "Q13 serverd上的/root/hwreport.txt中DISK_SIZE_VDB不等于NONE"
     fi
     if [ $q13score -gt 49 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q13 生成硬件报告"
     fi   
 }
@@ -539,6 +552,7 @@ q14score=0
         fail && echo "Q14 在bastion上未能自动解密/home/greg/ansible/locker.yml"
     fi
     if [ $q14score -gt 3 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q14 创建密码库"
     fi   
 }
@@ -586,6 +600,7 @@ q15score=0
         fi
     done
     if [ $q15score -gt 19 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q15 创建用户帐户"
     fi   
 }
@@ -599,6 +614,7 @@ q16score=0
         fail && echo "Q16 无法使用新密码解密文件"
     fi
     if [ $q16score -gt 1 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q16 更新 Ansible 库的密钥"
     fi   
 }
@@ -612,6 +628,7 @@ q17score=0
         fail && echo "Q17 未检测到为natasha用户分配每两分钟的任务"
     fi
     if [ $q17score -gt 1 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q17 配置 cron 作业"
     fi       
 }
@@ -641,6 +658,7 @@ q18score=0
         fi
     done
     if [ $q18score -gt 13 ];then
+        count=$(expr $count + 1 )
         pass && echo "Q18 配置 timesync 角色"
     fi       
 }
@@ -906,3 +924,14 @@ create_user
 update_vault
 cronfile
 timesyncrole
+
+echo
+echo '===================================================================='
+echo
+echo
+if [ $count -gt 12 ];then
+  pass && echo "你本次已至少获得70%的分数, 通过了模拟测试" 
+else
+  fail && echo "你本次尚未获得70%的分数, 暂未通过考试, 加油哦, 看好你" 
+fi
+echo
