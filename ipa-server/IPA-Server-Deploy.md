@@ -338,6 +338,12 @@ lxh-ipa-master.lxh.cn: master
 lxh-ipa-slave.lxh.cn: master
 ```
 
+# 强制数据同步一次
+
+```bash
+ipa-replica-manage force-sync --from lxh-ipa-master.lxh.cn
+```
+
 ## 测试dashboard
 
 在客户端上，需要在hosts文件中，添加IP到FQDN的解析
