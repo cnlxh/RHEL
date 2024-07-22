@@ -103,6 +103,8 @@ yum install certbot -y
 
 下方的<mark>--dry-run是模拟测试</mark>，并不会真的去申请证书，所有流程都通了之后，去掉这个参数发起真的证书申请
 
+加上<mark>--server https://xx.xx.xx</mark> 可以指定CA地址，如果不指定，默认是Let’s Encrypt
+
 ```bash
 certbot certonly --webroot -w /var/www/html/ -d mail.credclouds.com -d autodiscover.credclouds.com --dry-run
 ```
@@ -269,6 +271,7 @@ chmod 400 /etc/letsencrypt/cloudflare.ini
 ### 证书申请
 
 #### 模拟测试
+加上<mark>--server https://xx.xx.xx</mark> 可以指定CA地址，如果不指定，默认是Let’s Encrypt
 
 给<mark>lixiaohui.credclouds.com</mark>和<mark>lxh.credclouds.com</mark>申请域名
 
