@@ -425,4 +425,62 @@ No renewals were attempted.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ```
 
+就像刚才说的，没有到期，会跳过续签，为了看到效果，我们可以强制续签一次
+
+```bash
+certbot renew --force-renewal
+```
+
+从下面的输出来看，证书已成功续签
+
+```textile
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Processing /etc/letsencrypt/renewal/lixiaohui.credclouds.com.conf
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Renewing an existing certificate for lixiaohui.credclouds.com and lxh.credclouds.com
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Processing /etc/letsencrypt/renewal/mail.credclouds.com.conf
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Renewing an existing certificate for mail.credclouds.com and autodiscover.credclouds.com
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Congratulations, all renewals succeeded: 
+  /etc/letsencrypt/live/lixiaohui.credclouds.com/fullchain.pem (success)
+  /etc/letsencrypt/live/mail.credclouds.com/fullchain.pem (success)
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+```
+
+重新看看证书有效期情况
+
+```bash
+certbot certificates
+```
+
+从下面的内容和上面证书申请时验证的时间来看，的确续签成功
+
+```textile
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Found the following certs:
+  Certificate Name: lixiaohui.credclouds.com
+    Serial Number: 492728985241af7f467fbccc180ab41c1c9
+    Key Type: ECDSA
+    Domains: lixiaohui.credclouds.com lxh.credclouds.com
+    Expiry Date: 2024-10-20 02:32:22+00:00 (VALID: 89 days)
+    Certificate Path: /etc/letsencrypt/live/lixiaohui.credclouds.com/fullchain.pem
+    Private Key Path: /etc/letsencrypt/live/lixiaohui.credclouds.com/privkey.pem
+  Certificate Name: mail.credclouds.com
+    Serial Number: 49f218915c0127e3667cdb7ca4c6e24d0aa
+    Key Type: ECDSA
+    Domains: mail.credclouds.com autodiscover.credclouds.com
+    Expiry Date: 2024-10-20 02:32:26+00:00 (VALID: 89 days)
+    Certificate Path: /etc/letsencrypt/live/mail.credclouds.com/fullchain.pem
+    Private Key Path: /etc/letsencrypt/live/mail.credclouds.com/privkey.pem
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+```
+
 
