@@ -238,10 +238,6 @@ apt update
 apt install python3-certbot-dns-cloudflare -y
 ```
 
-```bash
-apt install python3-pip python3.12-venv -y
-```
-
 #### RHEL系列
 
 ```bash
@@ -482,5 +478,3 @@ Found the following certs:
     Private Key Path: /etc/letsencrypt/live/mail.credclouds.com/privkey.pem
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ```
-
-
