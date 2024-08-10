@@ -29,32 +29,40 @@ servers=`cat /etc/rht | grep RHT_VMS= | cut -d = -f 2 |tr -d '"'`
 # Starting classroom
 
 echo "Starting classroom"
-rht-vmctl fullreset classroom -q &> /dev/null
 
-if [ $? -ne 0 ];then
-	echo "Cannot reset classroom on your Computer, Please run 'rht-vmctl reset classroom -q' manually"
-	exit 1
-fi
-
-while true;do ping -c1 classroom &> /dev/null;
+if rht-vmctl status classroom | grep -q classroom;then
+	rht-vmctl fullreset classroom -q &> /dev/null
 	if [ $? -ne 0 ];then
-		sleep 1;
-	else
-		break
+		echo "Cannot reset classroom on your Computer, Please run 'rht-vmctl reset classroom -q' manually"
+		exit 1
 	fi
-done
-
+	while true;do
+		ping -c1 classroom &> /dev/null
+		if [ $? -ne 0 ];then
+			sleep 1
+		else
+			break
+		fi
+	done
+fi
 
 # Starting bastion and utility
 
 echo "Starting bastion and utility"
 
-if echo $servers | grep -q bastion;then
-	servers=$(echo $servers | sed 's/bastion //g')
-	servers=$(echo $servers | sed 's/utility //g')
+servers=$(echo $servers | sed 's/bastion //g')
+
+if rht-vmctl status all | grep -q bastion;then
 	rht-vmctl fullreset bastion -q &> /dev/null
-	sleep 20s
+fi
+
+servers=$(echo $servers | sed 's/utility //g')
+
+if rht-vmctl status all | grep -q utility;then
 	rht-vmctl fullreset utility -q &> /dev/null
+fi
+
+if rht-vmctl status all | grep -q bastion;then
 	while true;do
 		ping -c1 bastion &> /dev/null
 		if [ $? -ne 0 ];then
@@ -63,6 +71,10 @@ if echo $servers | grep -q bastion;then
 			break
 		fi
 	done
+fi
+
+
+if rht-vmctl status all | grep -q utility;then
 	while true;do
 		ping -c1 utility &> /dev/null
 		if [ $? -ne 0 ];then
@@ -73,13 +85,13 @@ if echo $servers | grep -q bastion;then
 	done
 fi
 
-
 # Starting workstation
 
 echo "Starting workstation"
 
-if echo $servers | grep -q workstation;then
-	servers=$(echo $servers | sed 's/workstation //g')
+servers=$(echo $servers | sed 's/workstation //g')
+
+if rht-vmctl status all | grep -q workstation;then
 	rht-vmctl fullreset workstation -q &> /dev/null
 	while true;do
 		ping -c1 workstation &> /dev/null
