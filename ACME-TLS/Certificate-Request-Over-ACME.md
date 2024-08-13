@@ -268,9 +268,12 @@ EOF
 chmod 400 /etc/letsencrypt/cloudflare.ini
 ```
 
-### 证书申请
+### 多域名证书申请
 
-#### 模拟测试
+#### cloudflare dns案例
+
+##### 模拟测试
+
 加上<mark>--server https://xx.xx.xx</mark> 可以指定CA地址，如果不指定，默认是Let’s Encrypt
 
 给<mark>lixiaohui.credclouds.com</mark>和<mark>lxh.credclouds.com</mark>申请域名
@@ -292,7 +295,7 @@ Waiting 60 seconds for DNS changes to propagate
 The dry run was successful.
 ```
 
-#### 正式申请证书
+##### 正式申请证书
 
 <mark>去掉--dry-run</mark>
 
@@ -317,6 +320,98 @@ Key is saved at:         /etc/letsencrypt/live/lixiaohui.credclouds.com/privkey.
 This certificate expires on 2024-10-20.
 These files will be updated when the certificate renews.
 Certbot has set up a scheduled task to automatically renew this certificate in the background.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+If you like Certbot, please consider supporting our work by:
+ * Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+ * Donating to EFF:                    https://eff.org/donate-le
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+```
+
+#### 通配符证书申请案例
+
+##### 模拟测试
+
+```bash
+certbot certonly -d *.k8splatform.com --manual \
+--preferred-challenges dns --dry-run
+```
+
+在输出中，会自动输出需要你添加的dns解析，加好之后，回车继续，发现可以成功识别和申请
+
+```text
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Enter email address (used for urgent renewal and security notices)
+ (Enter 'c' to cancel): 939958092@qq.com
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Please read the Terms of Service at
+https://letsencrypt.org/documents/LE-SA-v1.4-April-3-2024.pdf. You must agree in
+order to register with the ACME server. Do you agree?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(Y)es/(N)o: y
+Account registered.
+Simulating a certificate request for *.k8splatform.com
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Please deploy a DNS TXT record under the name:
+
+_acme-challenge.k8splatform.com.
+
+with the following value:
+
+Cr6UEKVA59SvHmhv-pwL_aXHwpSZJweEE6dh6JAT8VE
+
+Before continuing, verify the TXT record has been deployed. Depending on the DNS
+provider, this may take some time, from a few seconds to multiple minutes. You can
+check if it has finished deploying with aid of online tools, such as the Google
+Admin Toolbox: https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.k8splatform.com.
+Look for one or more bolded line(s) below the line ';ANSWER'. It should show the
+value(s) you've just added.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Press Enter to Continue
+The dry run was successful.
+```
+
+##### 正式申请证书
+
+在暂停时，请添加txt记录到dns中
+
+不过要注意，手工申请的证书，可能不会自动续期，除非你指定了`--manual-auth-hook`之类的参数，来自动完成DNS记录添加过程中的认证等操作
+
+```bash
+certbot certonly -d *.k8splatform.com \
+--manual --preferred-challenges dns
+```
+
+```text
+Please deploy a DNS TXT record under the name:
+
+_acme-challenge.k8splatform.com.
+
+with the following value:
+
+kMXUdPv8PZIJq2Y6R14cUlXKzGU4d1J6ndsJFgoMnqA
+
+Before continuing, verify the TXT record has been deployed. Depending on the DNS
+provider, this may take some time, from a few seconds to multiple minutes. You can
+check if it has finished deploying with aid of online tools, such as the Google
+Admin Toolbox: https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.k8splatform.com.
+Look for one or more bolded line(s) below the line ';ANSWER'. It should show the
+value(s) you've just added.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Press Enter to Continue
+
+Successfully received certificate.
+Certificate is saved at: /etc/letsencrypt/live/k8splatform.com/fullchain.pem
+Key is saved at:         /etc/letsencrypt/live/k8splatform.com/privkey.pem
+This certificate expires on 2024-11-11.
+These files will be updated when the certificate renews.
+
+NEXT STEPS:
+- This certificate will not be renewed automatically. Autorenewal of --manual certificates requires the use of an authentication hook script (--manual-auth-hook) but one was not provided. To renew this certificate, repeat this same certbot command before the certificate's expiry date.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 If you like Certbot, please consider supporting our work by:
@@ -386,6 +481,8 @@ openssl x509 -in /etc/letsencrypt/live/lixiaohui.credclouds.com/fullchain.pem -t
 Certbot工具本身提供了续签的方式，我们可以做一个计划任务，让它每天执行证书到期时间的检查和续签
 
 在Linux中，添加一个计划任务用于自动续签，我添加了一个在早上九点自动执行续签的计划任务
+
+不过要注意，手工申请的证书，可能不会自动续期，除非你指定了`--manual-auth-hook`之类的参数，来自动完成DNS记录添加过程中的认证等操作
 
 ```bash
 crontab -e
