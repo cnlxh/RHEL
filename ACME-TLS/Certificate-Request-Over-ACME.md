@@ -328,9 +328,9 @@ If you like Certbot, please consider supporting our work by:
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ```
 
-#### 通配符证书申请案例
+### 通配符证书申请案例
 
-##### 模拟测试
+#### 模拟测试
 
 ```bash
 certbot certonly -d *.k8splatform.com --manual \
@@ -374,7 +374,7 @@ Press Enter to Continue
 The dry run was successful.
 ```
 
-##### 正式申请证书
+#### 正式申请证书
 
 在暂停时，请添加txt记录到dns中
 
@@ -420,7 +420,7 @@ If you like Certbot, please consider supporting our work by:
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ```
 
-#### 验证证书
+### 验证证书
 
 ```bash
 certbot certificates
