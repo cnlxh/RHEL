@@ -6,7 +6,7 @@
 # self test only, please do not use it on production or others
 
 orgserveraip=172.25.250.10
-serveraip=172.25.250.111
+serveraip=172.25.250.10
 serverbip=172.25.250.11
 
 function servera_sshpasscmd {
