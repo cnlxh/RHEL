@@ -20,41 +20,41 @@ function pass {
 function fail {
   echo -ne "\033[31m FAIL \033[0m\t"
 }
-function prepare_network_hostsfile {
-ssh root@servera "nmcli connection modify 'Wired connection 2' ipv4.method manual ipv4.addresses 172.25.250.111/24 ipv4.gateway 172.25.250.254 ipv4.dns 172.25.250.220 connection.autoconnect yes" &> /dev/null
-ssh root@servera "nmcli connection modify 'Wired connection 2' con-name 'Do-not-modify'" &> /dev/null
-ssh root@servera "nmcli connection down 'Wired connection 2';nmcli connection up 'Wired connection 2'" &> /dev/null
-ssh root@servera "nmcli connection down 'Do-not-modify';nmcli connection up 'Do-not-modify'" &> /dev/null
-ssh root@$serveraip "chattr +i /etc/NetworkManager/system-connections/'Wired connection 2.nmconnection'" &> /dev/null
+# function prepare_network_hostsfile {
+# ssh root@servera "nmcli connection modify 'Wired connection 2' ipv4.method manual ipv4.addresses 172.25.250.111/24 ipv4.gateway 172.25.250.254 ipv4.dns 172.25.250.220 connection.autoconnect yes" &> /dev/null
+# ssh root@servera "nmcli connection modify 'Wired connection 2' con-name 'Do-not-modify'" &> /dev/null
+# ssh root@servera "nmcli connection down 'Wired connection 2';nmcli connection up 'Wired connection 2'" &> /dev/null
+# ssh root@servera "nmcli connection down 'Do-not-modify';nmcli connection up 'Do-not-modify'" &> /dev/null
+# ssh root@$serveraip "chattr +i /etc/NetworkManager/system-connections/'Wired connection 2.nmconnection'" &> /dev/null
 
-sed -i 's/^172.25.250.10/172.25.250.100/g' /etc/hosts &> /dev/null
-cat > /tmp/hosts <<EOF
-127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
-::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-172.25.254.254 classroom.example.com
-172.25.250.100 servera.lab.example.com servera
-172.25.250.11 serverb.lab.example.com serverb
-EOF
-scp /tmp/hosts root@$serveraip:/etc/ &> /dev/null
-scp /tmp/hosts root@$serverbip:/etc/ &> /dev/null
-rm -rf /tmp/hosts
-}
-function network-q1 {
-    while true;do ssh root@$orgserveraip ls &> /dev/null
-        if [ $? -eq 0 ]; then
-            sleep 5s
-            break
-        fi
-    done
-    ssh root@$serveraip "nmcli connection modify 'Wired connection 1' ipv4.method auto ipv4.addresses 1.1.1.1/24 ipv4.gateway 1.1.1.1 ipv4.dns 1.1.1.1 connection.autoconnect no" &> /dev/null
-    ssh root@$serveraip "nmcli connection down 'Wired connection 1 -w 5'" &> /dev/null
-    ssh root@$serveraip "hostnamectl hostname lixiaohui" &> /dev/null
-    if `ssh root@$serveraip "nmcli connection show 'Do-not-modify'" | grep -q '172.25.250.111'`;then
-        pass && echo "Q1 网络设置成功"
-    else
-        fail && echo "Q1 网络设置失败"
-    fi
-}
+# sed -i 's/^172.25.250.10/172.25.250.100/g' /etc/hosts &> /dev/null
+# cat > /tmp/hosts <<EOF
+# 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+# ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+# 172.25.254.254 classroom.example.com
+# 172.25.250.100 servera.lab.example.com servera
+# 172.25.250.11 serverb.lab.example.com serverb
+# EOF
+# scp /tmp/hosts root@$serveraip:/etc/ &> /dev/null
+# scp /tmp/hosts root@$serverbip:/etc/ &> /dev/null
+# rm -rf /tmp/hosts
+# }
+# function network-q1 {
+#     while true;do ssh root@$orgserveraip ls &> /dev/null
+#         if [ $? -eq 0 ]; then
+#             sleep 5s
+#             break
+#         fi
+#     done
+#     ssh root@$serveraip "nmcli connection modify 'Wired connection 1' ipv4.method auto ipv4.addresses 1.1.1.1/24 ipv4.gateway 1.1.1.1 ipv4.dns 1.1.1.1 connection.autoconnect no" &> /dev/null
+#     ssh root@$serveraip "nmcli connection down 'Wired connection 1 -w 5'" &> /dev/null
+#     ssh root@$serveraip "hostnamectl hostname lixiaohui" &> /dev/null
+#     if `ssh root@$serveraip "nmcli connection show 'Do-not-modify'" | grep -q '172.25.250.111'`;then
+#         pass && echo "Q1 网络设置成功"
+#     else
+#         fail && echo "Q1 网络设置失败"
+#     fi
+# }
 function repository-q2 {
     ssh root@$serveraip "mv /etc/yum.repos.d/* /opt/" &> /dev/null
     if ssh root@$serveraip "ls /etc/yum.repos.d/ | wc -l" | grep -q 0;then
@@ -147,8 +147,8 @@ function podman-q13 {
 cat > /tmp/Containerfile <<EOF
 FROM registry.lab.example.com/ubi9-beta/ubi:latest
 RUN mkdir /dir{1,2}
-RUN echo -e '[rhel-9.0-for-x86_64-baseos-rpms]\nbaseurl = http://content.example.com/rhel9.0/x86_64/dvd/BaseOS\nenabled = true\ngpgcheck = false\nname = Red Hat Enterprise Linux 9.0 BaseOS (dvd)\n[rhel-9.0-for-x86_64-appstream-rpms]\nbaseurl = http://content.example.com/rhel9.0/x86_64/dvd/AppStream\nenabled = true\ngpgcheck = false\nname = Red Hat Enterprise Linux 9.0 Appstream (dvd)'>/etc/yum.repos.d/rhel_dvd.repo
-RUN yum install --disablerepo=* --enablerepo=rhel-9.0-for-x86_64-baseos-rpms --enablerepo=rhel-9.0-for-x86_64-appstream-rpms -y python3
+RUN echo -e '[rhel-9.3-for-x86_64-baseos-rpms]\nbaseurl = http://content.example.com/rhel9.3/x86_64/dvd/BaseOS\nenabled = true\ngpgcheck = false\nname = Red Hat Enterprise Linux 9.3 BaseOS (dvd)\n[rhel-9.3-for-x86_64-appstream-rpms]\nbaseurl = http://content.example.com/rhel9.3/x86_64/dvd/AppStream\nenabled = true\ngpgcheck = false\nname = Red Hat Enterprise Linux 9.3 Appstream (dvd)'>/etc/yum.repos.d/rhel_dvd.repo
+RUN yum install --disablerepo=* --enablerepo=rhel-9.3-for-x86_64-baseos-rpms --enablerepo=rhel-9.3-for-x86_64-appstream-rpms -y python3
 CMD ["/bin/bash", "-c", "sleep infinity"]
 EOF
 scp /tmp/Containerfile root@classroom:/var/www/html/ &>/dev/null
@@ -223,8 +223,8 @@ function servera-netowrk-auto {
 # create for serverb
 function prepare_serverb {
     rht-vmctl poweroff serverb -q &> /dev/null
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverb-c.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverb-d.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverb-c.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverb-d.qcow2
     virsh detach-disk serverb vdb --config &> /dev/null
     virsh attach-disk serverb /var/lib/libvirt/images/serverb-c.qcow2 vdb --config --subdriver qcow2 &> /dev/null
     rht-vmctl start serverb -q &> /dev/null
@@ -341,7 +341,7 @@ done
 echo "请稍后, 正在批量重置servera|serverb"
 for host in servera serverb;do
     rht-vmctl fullreset $host -q &> /dev/null
-    virsh attach-interface --domain servera --type bridge --source privbr0 --model virtio --live --config &> /dev/null
+#    virsh attach-interface --domain servera --type bridge --source privbr0 --model virtio --live --config &> /dev/null
 done
 
 echo "请稍后, 正在启动servera并等待其上线,如果5分钟还无法上线,请手工重启此虚拟机"
@@ -385,10 +385,9 @@ for host in classroom servera serverb;do
     ssh root@$host "echo flectrag | passwd --stdin root"  &> /dev/null
 done
 
-pass && echo "题号不连续是因为有些题目无需做测试准备"
+pass && echo "不需要关注以下显示顺序和数量"
 prepare_network_hostsfile
 network-q1
-repository-q2
 selinux-q3
 ntp_set
 autofs-q8
@@ -399,6 +398,7 @@ podman-q13
 podman-q14
 script-16d
 script-16e
+repository-q2
 servera-netowrk-auto
 prepare_serverb
 lvm-q19
