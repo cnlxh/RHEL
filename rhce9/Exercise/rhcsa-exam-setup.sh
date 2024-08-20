@@ -386,8 +386,8 @@ for host in classroom servera serverb;do
 done
 
 pass && echo "不需要关注以下显示顺序和数量"
-prepare_network_hostsfile
-network-q1
+# prepare_network_hostsfile
+# network-q1
 selinux-q3
 ntp_set
 autofs-q8
