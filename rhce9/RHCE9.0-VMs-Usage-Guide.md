@@ -1,4 +1,3 @@
-
 ```textile
 作者：李晓辉
 
@@ -13,17 +12,16 @@
 
 **此课程对内存要求较高，以下内存的表述是指，除操作系统以及操作系统平时用的软件之外，需要给虚拟机16G内存，如果操作系统平时开机后就占用很多，需要看看怎么缩减系统占用，而不要减少虚拟机的配置**
 
-|CPU|内存|硬盘|操作系统|软件版本|
-|-|-|-|-|-|
-|10代i5以上|至少16G，推荐32G|至少100G SSD|Windows10 x64<br>MAC Book|Windows: 至少VMware Workstaion 17<br>MAC: intel版本的Fustion，不支持任何ARM架构CPU<br>解压软件：7z解压缩软件|
-
+| CPU     | 内存          | 硬盘         | 操作系统                      | 软件版本                                                                                  |
+| ------- | ----------- | ---------- | ------------------------- | ------------------------------------------------------------------------------------- |
+| 10代i5以上 | 至少16G，推荐32G | 至少100G SSD | Windows10 x64<br>MAC Book | Windows: 至少VMware Workstaion 17<br>MAC: intel版本的Fustion，不支持任何ARM架构CPU<br>解压软件：7z解压缩软件 |
 
 ## 虚拟机账号密码
 
-|角色|账号|密码|
-|-|-|-|
-|foundation|root<br>kiosk|Asimov<br>redhat|
-|所有其他虚拟机|root<br>student|redhat<br>student|
+| 角色         | 账号              | 密码                |
+| ---------- | --------------- | ----------------- |
+| foundation | root<br>kiosk   | Asimov<br>redhat  |
+| 所有其他虚拟机    | root<br>student | redhat<br>student |
 
 ## 准备工作
 
@@ -37,7 +35,7 @@ https://www.vmware.com/go/getworkstation-win
 
 ### 修改VMware 虚拟机的网卡信息
 
-为了更顺利的使用ssh工具连接虚拟机，需要在安装好VMware的情况下，将虚拟机所使用的网络修改为 `VMnet1`，并将VMnet1的网络修改为 `172.25.254.250/24` 网段
+为了更顺利的使用ssh工具连接虚拟机，需要在安装好VMware的情况下，将虚拟机所使用的网络修改为 `VMnet1`，并将VMnet1的网络修改为 `172.25.254.0/24` 网段
 
 在VMware软件左上角点击 `编辑` ，点击 `虚拟网络编辑器`
 
@@ -47,7 +45,7 @@ https://www.vmware.com/go/getworkstation-win
 
 ![vmnetedit](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vmware/changeset.png)
 
-确保选中了 `VMnet1` ，并将子网信息改为 `172.25.254.250` ， 掩码 `255.255.255.0` 点击确定
+确保选中了 `VMnet1` ，并将子网信息改为 `172.25.254.0` ， 掩码 `255.255.255.0` 点击确定
 
 ![vm-network-confirm](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vmware/vm-network-confirm.png)
 
@@ -75,11 +73,9 @@ https://www.vmware.com/go/getworkstation-win
 
 ![confirm-vmnet1-at-vm](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vmware/confirm-vmnet1-at-vm.png)
 
-
 如果配置调整完成，点击 `开启此虚拟机`
 
 ![start-vm](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vmware/start-vm.png)
-
 
 ### 使用SSH 工具远程连接环境
 
@@ -109,25 +105,32 @@ https://download.mobatek.net/2362023122033030/MobaXterm_Portable_v23.6.zip
 
 1. 恢复最开始`虚拟机自带`的快照，并使虚拟机开机
 
-2. 下载自动初始化虚拟机的脚本，下载链接如下，直接用你的下载工具下载，下载完名字叫`reset-vm.sh`
-
-```bash
-https://gitee.com/cnlxh/rhel/raw/master/reset-vm.sh
- ```
-
-3. 点击左侧的SFTP按钮，确认我们位于 `/home/kiosk/`，点击上传按钮，将我们下载好的 `reset-vm.sh` 上传到/home/kiosk下
+2. 用SSH工具连接虚拟机后，点击左侧的SFTP按钮，确认我们位于 `/home/kiosk/`，点击上传按钮，将我们下载好的 `reset-vm.sh` 上传到/home/kiosk下
 
 ![mobaxterm-sftp](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/mobaxterm/mobaxterm-sftp.png)
+
+3. 运行自动初始化虚拟机的脚本，脚本名字叫`reset-vm.sh`
+
+`su - root`会让你输入密码，请输入`Asimov`
+
+```bash
+su - root
+```
+
+```bash
+cd /home/kiosk
+bash reset-vm.sh
+```
 
 4. 设置课程并初始化虚拟机
 
 直接在登录好的窗口中执行以下命令，来完成设置课程以及初始化虚拟机，在此过程中，会问你希望设置的课程代码是什么，请根据你的需求来设置
 
-  1. 第一本书的课程代码是 `rh124`
+1. 第一本书的课程代码是 `rh124`
 
-  2. 第二本书的课程代码是 `rh134`
+2. 第二本书的课程代码是 `rh134`
 
-  3. 第三本书的课程代码是 `rh294`
+3. 第三本书的课程代码是 `rh294`
 
 执行命令如下：
 
@@ -135,7 +138,6 @@ https://gitee.com/cnlxh/rhel/raw/master/reset-vm.sh
 [kiosk@foundation0 ~]$ cd /home/kiosk
 [kiosk@foundation0 ~]$ bash reset-vm.sh
 Which course do you want to set:
-
 ```
 
 ## 手工初始化虚拟机环境
@@ -189,6 +191,7 @@ rht-vmctl reset classroom -q
 ```bash
 rht-vmview view classroom
 ```
+
 ![confirm-classroom](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vm-usage-guide/confirm-classroom.png)
 
 classroom必须先reset开机，然后依次类推，需要按照顺序，将其他虚拟机reset开机，具体顺序为：
@@ -212,4 +215,3 @@ classroom必须先reset开机，然后依次类推，需要按照顺序，将其
 2. serverc serverd只有在rh294课程中出现
 
 在将课程代码设置为rh124 rh134后，serverc和serverd是不存在的，只有将课程代码设置为rh294才会出现
-
