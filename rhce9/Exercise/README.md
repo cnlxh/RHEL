@@ -12,7 +12,7 @@
 
 # RHCE9 虚拟机环境使用指南
 
-如果你是初次上课，需要了解以下信息，请点击这里前往了解--->：[点我了解课程虚拟机环境使用指南](https://gitee.com/cnlxh/rhel/blob/master/rhce9/RHCE9.0-VMs-Usage-Guide.md)
+如果你是初次上课，需要了解以下信息，请阅读`课程虚拟机环境使用指南`
 
 1. 下载的资料如何使用
 
@@ -30,12 +30,7 @@
 
 1. 恢复最开始`虚拟机自带`的快照，并使虚拟机开机
 
-2. 下载本仓库的所有资料，下载链接如下所示，必须复制到浏览器进行下载，下载完名字叫`rhel-master.zip`
-
-```bash
-https://gitee.com/cnlxh/rhel/repository/archive/master.zip
- ```
-3. 使用MobaXterm等工具将下载好的`rhel-master.zip`，在MobaXterm上用root身份登录foundation0后，上传到foundation虚拟机中的`/root`，MobaXterm工具下载地址如下：
+2. 使用MobaXterm等工具将Exercise.zip上传到foundation0中  ，在MobaXterm上用kiosk身份登录foundation0后，上传到foundation虚拟机中的`/home/kiosk`，MobaXterm工具下载地址如下：
 
 ```bash
 https://download.mobatek.net/2402024022512842/MobaXterm_Portable_v24.0.zip
@@ -61,39 +56,35 @@ https://download.mobatek.net/2402024022512842/MobaXterm_Portable_v24.0.zip
 su - root
 ```
 
-4. 点击左侧的SFTP按钮，确认我们位于 `/home/kiosk/`，点击上传按钮，将我们下载好的 `rhel-master.zip` 上传到/home/kiosk下
+3. 点击左侧的SFTP按钮，确认我们位于 `/home/kiosk/`，点击上传按钮，将我们准备的 `Exercise.zip` 上传到/home/kiosk下
 
 ![mobaxterm-sftp](https://gitee.com/cnlxh/images/raw/master/mobaxterm/mobaxterm-kiosk-sftp.png)
 
-5. 将文件复制到`/root`中方便`root`用户使用，以下所有表述都表述为上传到`/root`中
-
-```bash
-cp /home/kiosk/rhel-master.zip /root
-```
 ## RHCSA 环境部署
 
 执行RHCSA 环境部署之前，必须已经完成准备工作
 
 本环境对应的题目是解压后的`rh200.md`, 在本次模拟中，衡量的角度有限，你`必须用`此文件中的方法做题，不然模拟判题将出现问题，正式考试中，不限制做题思路，只要你只要达到题目效果即可
 
-1. 在将`rhel-master.zip`上传到foundation的`/root`中后，执行解压操作
-
-```bash
-cd /root/
-unzip rhel-master.zip
-```
+1. 在将`Exercise.zip`上传到foundation的`/home/kiosk`中后，切换到root身份并解压
+   
+   ```bash
+   su #请输入Asimov作为密码
+   cd /home/kiosk
+   unzip Exercise.zip
+   ```
 
 2. 开始部署EX200环境，这个过程需要较长时间，请耐心等待
 
 ```bash
-cd /root/rhel-master/rhce9/Exercise
+cd /home/kiosk/Exercise
 bash rhcsa-exam-setup.sh
 ```
 
 3. 根据`rh200.html`答题完毕后，执行以下步骤进行判断对错
 
 ```bash
-cd /root/rhel-master/rhce9/Exercise
+cd /home/kiosk/Exercise
 bash rhcsa-exam-grade.sh
 ```
 
@@ -101,26 +92,26 @@ bash rhcsa-exam-grade.sh
 
 注意： `请在执行RHCE 环境部署之前，重新恢复虚拟机自带的快照，并使其开机，重新完成准备工作，而不要在RHCSA的基础上执行`
 
-
 本环境对应的题目是解压后的`rh294.md`,  在本次模拟中，衡量的角度有限，你`必须用`此文件中的方法做题，不然模拟判题将出现问题，正式考试中，不限制做题思路，只要你只要达到题目效果即可
 
-1. 在将`rhel-master.zip`上传到foundation的`/root`中后，执行解压操作
-
-```bash
-cd /root/
-unzip rhel-master.zip
-```
+1. 在将`Exercise.zip`上传到foundation的`/home/kiosk`中后，切换到root身份并解压
+   
+   ```bash
+   su #请输入Asimov作为密码
+   cd /home/kiosk
+   unzip Exercise.zip
+   ```
 
 2. 开始部署EX294环境，这个过程需要较长时间，请耐心等待
 
 ```bash
-cd /root/rhel-master/rhce9/Exercise
+cd /home/kiosk/Exercise
 bash rhce-exam-setup.sh
 ```
 
 3. 根据`rh294.html`答题完毕后，执行以下步骤进行判断对错
 
 ```bash
-cd /root/rhel-master/rhce9/Exercise
+cd /home/kiosk/Exercise
 bash rhce-exam-grade.sh
 ```
