@@ -474,7 +474,7 @@ function script-q16e {
         q16escore=$(expr $q16escore + 2 )
         count=$(expr $count + 1 )
     else
-        fail && echo "Q16E /root/newfiles/16d.txt不存在或者不具有SUID权限"
+        fail && echo "Q16E /root/newfiles/16e.txt不存在或者不具有SUID权限"
     fi
     if [ $q16escore -gt 5 ]; then
         count=$(expr $count + 1 )
