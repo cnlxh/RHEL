@@ -69,7 +69,7 @@ su - root
 1. 在将`Exercise.zip`上传到foundation的`/home/kiosk`中后，切换到root身份并解压
    
    ```bash
-   su #请输入Asimov作为密码
+   su - #，不要忘了su后面的中横杠, 请输入Asimov作为密码
    cd /home/kiosk
    unzip Exercise.zip
    ```

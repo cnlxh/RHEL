@@ -55,9 +55,9 @@ done
 }
 function collection {
     echo "正在准备集合内容"
-    cp ./redhat-insights-1.0.7.tar.gz /content/courses/rh294/rhel9.0/materials/ &> /dev/null
-    cp ./community-general-5.5.0.tar.gz /content/courses/rh294/rhel9.0/materials/ &> /dev/null
-    cp ./redhat-rhel_system_roles-1.19.3.tar.gz /content/courses/rh294/rhel9.0/materials/ &> /dev/null
+    cp redhat-insights-1.0.7.tar.gz /content/courses/rh294/rhel9.0/materials/ &> /dev/null
+    cp community-general-5.5.0.tar.gz /content/courses/rh294/rhel9.0/materials/ &> /dev/null
+    cp redhat-rhel_system_roles-1.19.3.tar.gz /content/courses/rh294/rhel9.0/materials/ &> /dev/null
     if ! [ -e /content/courses/rh294/rhel9.0/materials/redhat-insights-1.0.7.tar.gz ] && ! [ -e /content/courses/rh294/rhel9.0/materials/community-general-5.5.0.tar.gz ] && ! [ -e /content/courses/rh294/rhel9.0/materials/redhat-rhel_system_roles-1.19.3.tar.gz ];then
         fail && echo "没有在/content/courses/rh294/rhel9.0/materials检测到三个集合, 请手工把三个集合压缩包复制到/content/courses/rh294/rhel9.0/materials中"
     fi
@@ -66,8 +66,8 @@ function collection {
 
 function galaxy_install {
     echo "正在准备phpinfo和haproxy 角色"
-    cp ./haproxy.tar /content/courses/rh294/rhel9.0/materials/ &> /dev/null
-    cp ./phpinfo.tar /content/courses/rh294/rhel9.0/materials/ &> /dev/null
+    cp haproxy.tar /content/courses/rh294/rhel9.0/materials/ &> /dev/null
+    cp phpinfo.tar /content/courses/rh294/rhel9.0/materials/ &> /dev/null
     if ! [ -e /content/courses/rh294/rhel9.0/materials/haproxy.tar ] || ! [ -e/content/courses/rh294/rhel9.0/materials/phpinfo.tar ];then
         fail && echo "没有在/content/courses/rh294/rhel9.0/materials检测到两个角色安装包, 请手工把压缩包复制到/content/courses/rh294/rhel9.0/materials中"
     fi
