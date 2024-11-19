@@ -298,6 +298,45 @@ if ! [ "$(id -u)" -eq 0 ]; then
      exit 1
 fi
 
+# custom ssh config on foundation0
+
+cat > /root/.ssh/config <<EOF
+Host 172.25.254.*
+    PreferredAuthentications password
+    StrictHostKeyChecking no
+Host 172.25.250.*
+    PreferredAuthentications password
+    StrictHostKeyChecking no
+Host *.ilt.example.com f* g*
+    StrictHostKeyChecking no
+    PreferredAuthentications publickey
+    User kiosk
+Host classroom.example.com classroom c classroom
+    StrictHostKeyChecking no
+    PreferredAuthentications publickey
+    User instructor
+Host bastion.lab.example.com bastion
+    PreferredAuthentications password
+    StrictHostKeyChecking no
+Host workstation.lab.example.com workstation
+    PreferredAuthentications password
+    StrictHostKeyChecking no
+Host servera.lab.example.com servera
+    PreferredAuthentications password
+    StrictHostKeyChecking no
+Host serverb.lab.example.com serverb
+    PreferredAuthentications password
+    StrictHostKeyChecking no
+Host serverc.lab.example.com serverc
+    PreferredAuthentications password
+    StrictHostKeyChecking no
+Host serverd.lab.example.com serverd
+    PreferredAuthentications password
+    StrictHostKeyChecking no
+Host *.lab.example.com
+    StrictHostKeyChecking no
+EOF
+
 echo "请稍后, 正在将你的所有虚拟机关机"
 rht-vmctl poweroff all -q &>/dev/null
 rht-clearcourse 0 &>/dev/null
@@ -429,36 +468,3 @@ ssh student@workstation 'lab start boot-resetting' &>/dev/null
 ssh root@workstation 'systemctl poweroff' &>/dev/null
 
 virsh undefine workstation &>/dev/null
-
-# custom ssh config on foundation0
-
-cat > /root/.ssh/config <<EOF
-Host *.ilt.example.com f* g*
-    StrictHostKeyChecking no
-    PreferredAuthentications publickey
-    User kiosk
-Host classroom.example.com classroom c classroom
-    StrictHostKeyChecking no
-    PreferredAuthentications publickey
-    User instructor
-Host bastion.lab.example.com bastion
-    PreferredAuthentications password
-    StrictHostKeyChecking no
-Host workstation.lab.example.com workstation
-    PreferredAuthentications password
-    StrictHostKeyChecking no
-Host servera.lab.example.com servera
-    PreferredAuthentications password
-    StrictHostKeyChecking no
-Host serverb.lab.example.com serverb
-    PreferredAuthentications password
-    StrictHostKeyChecking no
-Host serverc.lab.example.com serverc
-    PreferredAuthentications password
-    StrictHostKeyChecking no
-Host serverd.lab.example.com serverd
-    PreferredAuthentications password
-    StrictHostKeyChecking no
-Host *.lab.example.com
-    StrictHostKeyChecking no
-EOF
