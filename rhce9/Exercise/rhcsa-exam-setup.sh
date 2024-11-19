@@ -21,6 +21,7 @@ function fail {
   echo -ne "\033[31m FAIL \033[0m\t"
 }
 function prepare_network_hostsfile {
+ssh root@servera "nmcli connection modify 'System eth0' con-name 'Wired connection 2'
 ssh root@servera "nmcli connection modify 'Wired connection 2' ipv4.method manual ipv4.addresses 172.25.250.111/24 ipv4.gateway 172.25.250.254 ipv4.dns 172.25.250.220 connection.autoconnect yes" &> /dev/null
 ssh root@servera "nmcli connection modify 'Wired connection 2' con-name 'Do-not-modify'" &> /dev/null
 ssh root@servera "nmcli connection down 'Wired connection 2';nmcli connection up 'Wired connection 2'" &> /dev/null
