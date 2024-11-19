@@ -147,8 +147,8 @@ function podman-q13 {
 cat > /tmp/Containerfile <<EOF
 FROM registry.lab.example.com/ubi9-beta/ubi:latest
 RUN mkdir /dir{1,2}
-RUN echo -e '[rhel-9.0-for-x86_64-baseos-rpms]\nbaseurl = http://content.example.com/rhel9.0/x86_64/dvd/BaseOS\nenabled = true\ngpgcheck = false\nname = Red Hat Enterprise Linux 9.0 BaseOS (dvd)\n[rhel-9.0-for-x86_64-appstream-rpms]\nbaseurl = http://content.example.com/rhel9.0/x86_64/dvd/AppStream\nenabled = true\ngpgcheck = false\nname = Red Hat Enterprise Linux 9.0 Appstream (dvd)'>/etc/yum.repos.d/rhel_dvd.repo
-RUN yum install --disablerepo=* --enablerepo=rhel-9.0-for-x86_64-baseos-rpms --enablerepo=rhel-9.0-for-x86_64-appstream-rpms -y python3
+RUN echo -e '[rhel-9.3-for-x86_64-baseos-rpms]\nbaseurl = http://content.example.com/rhel9.3/x86_64/dvd/BaseOS\nenabled = true\ngpgcheck = false\nname = Red Hat Enterprise Linux 9.3 BaseOS (dvd)\n[rhel-9.3-for-x86_64-appstream-rpms]\nbaseurl = http://content.example.com/rhel9.3/x86_64/dvd/AppStream\nenabled = true\ngpgcheck = false\nname = Red Hat Enterprise Linux 9.3 Appstream (dvd)'>/etc/yum.repos.d/rhel_dvd.repo
+RUN yum install --disablerepo=* --enablerepo=rhel-9.3-for-x86_64-baseos-rpms --enablerepo=rhel-9.3-for-x86_64-appstream-rpms -y python3
 CMD ["/bin/bash", "-c", "sleep infinity"]
 EOF
 scp /tmp/Containerfile root@classroom:/var/www/html/ &>/dev/null
@@ -223,8 +223,8 @@ function servera-netowrk-auto {
 # create for serverb
 function prepare_serverb {
     rht-vmctl poweroff serverb -q &> /dev/null
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverb-c.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverb-d.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverb-c.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverb-d.qcow2
     virsh detach-disk serverb vdb --config &> /dev/null
     virsh attach-disk serverb /var/lib/libvirt/images/serverb-c.qcow2 vdb --config --subdriver qcow2 &> /dev/null
     rht-vmctl start serverb -q &> /dev/null
