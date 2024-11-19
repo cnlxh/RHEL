@@ -314,22 +314,16 @@ Host classroom.example.com classroom c classroom
     PreferredAuthentications publickey
     User instructor
 Host bastion.lab.example.com bastion
-    PreferredAuthentications password
     StrictHostKeyChecking no
 Host workstation.lab.example.com workstation
-    PreferredAuthentications password
     StrictHostKeyChecking no
 Host servera.lab.example.com servera
-    PreferredAuthentications password
     StrictHostKeyChecking no
 Host serverb.lab.example.com serverb
-    PreferredAuthentications password
     StrictHostKeyChecking no
 Host serverc.lab.example.com serverc
-    PreferredAuthentications password
     StrictHostKeyChecking no
 Host serverd.lab.example.com serverd
-    PreferredAuthentications password
     StrictHostKeyChecking no
 Host *.lab.example.com
     StrictHostKeyChecking no
