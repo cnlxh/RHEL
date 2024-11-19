@@ -20,17 +20,21 @@
 
 | 角色         | 账号              | 密码                |
 | ---------- | --------------- | ----------------- |
-| foundation | root<br>kiosk   | Asimov<br>redhat  |
+| VMware虚拟机 | root<br>kiosk   | Asimov<br>redhat  |
 | 所有其他虚拟机    | root<br>student | redhat<br>student |
 
 ## 准备工作
 
 ### VMware Workstation下载地址：
 
-将链接复制到浏览器，即可自动开始下载，另外此为付费软件，可试用，本次课程使用试用版，如有必要，请支持正版
+<mark>除非特别说明，不然请使用我们百度网盘里的版本或官网的最新版，所以请使用我们提供的版本升级你电脑上的VMware软件</mark>
+
+我们的百度网盘已提供了此软件的最新版下载，如需自己从官方下载，可以在下面的链接自行操作
+
+注册账号，打开以下链接选择Windows即可开始下载，此软件官方已确定对包括商用在内的场景免费，无版权问题
 
 ```textile
-https://www.vmware.com/go/getworkstation-win
+https://support.broadcom.com/group/ecx/productdownloads?subfamily=VMware%20Workstation%20Pro
 ```
 
 ### 修改VMware 虚拟机的网卡信息
@@ -45,7 +49,7 @@ https://www.vmware.com/go/getworkstation-win
 
 ![vmnetedit](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vmware/changeset.png)
 
-确保选中了 `VMnet1` ，并将子网信息改为 `172.25.254.0` ， 掩码 `255.255.255.0` 点击确定
+确保选中了 `VMnet1` ，并将子网信息改为 `172.25.254.0` ， 掩码 `255.255.255.0` ，另外要注意，我们需要去掉VMnet1网卡的DHCP功能，不然后续的bastion机器无法启动会导致环境无法使用，确认都改好了之后，点击确定
 
 ![vm-network-confirm](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vmware/vm-network-confirm.png)
 
