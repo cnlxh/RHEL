@@ -302,10 +302,8 @@ fi
 
 cat > /root/.ssh/config <<EOF
 Host 172.25.254.*
-    PreferredAuthentications password
     StrictHostKeyChecking no
 Host 172.25.250.*
-    PreferredAuthentications password
     StrictHostKeyChecking no
 Host *.ilt.example.com f* g*
     StrictHostKeyChecking no
