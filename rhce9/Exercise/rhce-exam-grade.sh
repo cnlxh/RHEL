@@ -573,11 +573,11 @@ q13score=0
     done
     for host in servera serverb serverc serverd workstation;do
         BIOS=`sshpasscmd $host 'grep ^BIOS= /root/hwreport.txt' 2> /dev/null | cut -d = -f 2`
-        if [[ -z $BIOS || $BIOS = 1.15.0-1.el9 ]];then
+        if [[ -z $BIOS || $BIOS = 1.16.1-1.el9 ]];then
             score=$(expr $score + 2 )
             q13score=$(expr $q13score + 2 )      
         else  
-            fail && echo Q13 "在$host上的/root/hwreport.txt中BIOS为空或没有等于1.15.0-1.el9, 请在bastion导出$host的facts, 只要bios中有值就忽略掉本错误即可"
+            fail && echo Q13 "在$host上的/root/hwreport.txt中BIOS为空或没有等于1.16.1-1.el9, 请在bastion导出$host的facts, 只要bios中有值就忽略掉本错误即可"
         fi
     done
     for host in servera serverb serverc serverd workstation;do
