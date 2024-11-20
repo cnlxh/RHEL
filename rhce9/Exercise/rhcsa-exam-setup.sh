@@ -142,7 +142,7 @@ function findchar-q11 {
 }
 function tar-q12 {
     ssh root@$serveraip touch /usr/local/bzip2filetest &> /dev/null
-    yum remove bzip2 -y &> /dev/null
+    ssh root@$serveraip yum remove bzip2 -y &> /dev/null
     pass && echo "Q12 创建存档" 
 }
 function podman-q13 {
