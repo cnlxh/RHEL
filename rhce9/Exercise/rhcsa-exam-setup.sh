@@ -176,7 +176,7 @@ ssh root@$serveraip chown wallah /home/wallah -R &>/dev/null
         fail && echo "Q13 wheel组中没有wallah"
     elif ! ssh root@$serveraip "grep '%wheel' /etc/sudoers | grep -i -q NOPASSWD"; then
         fail && echo "Q13 wheel的sudoersNOPASSWD设置失败"
-    elif ! curl -s http://classroom/Containerfile | grep -q "ubi9-beta"; then
+    elif ! curl -s http://classroom/Containerfile | grep -q "ubi9"; then
         fail && echo "Q13 Containerfile下载失败"
     elif ! ssh root@$serveraip dnf list installed | grep -q "container-tools"; then
         fail && echo "Q13 container-tools安装失败" 
