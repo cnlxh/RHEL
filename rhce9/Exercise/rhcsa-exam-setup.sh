@@ -21,14 +21,19 @@ function fail {
   echo -ne "\033[31m FAIL \033[0m\t"
 }
 function prepare_network_hostsfile {
-ssh root@servera "nmcli connection modify 'System eth1' con-name 'Wired connection 2'"
-ssh root@servera "nmcli connection modify 'Wired connection 2' ipv4.method manual ipv4.addresses 172.25.250.111/24 ipv4.gateway 172.25.250.254 ipv4.dns 172.25.250.220 connection.autoconnect yes" &> /dev/null
-ssh root@servera "nmcli connection modify 'Wired connection 2' con-name 'Do-not-modify'" &> /dev/null
-ssh root@servera "nmcli connection down 'Wired connection 2';nmcli connection up 'Wired connection 2'" &> /dev/null
-ssh root@servera "nmcli connection down 'Do-not-modify';nmcli connection up 'Do-not-modify'" &> /dev/null
-ssh root@$serveraip "chattr +i /etc/NetworkManager/system-connections/'Wired connection 2.nmconnection'" &> /dev/null
+# delete all of connection named eth1
+connections=$(ssh -o StrictHostKeyChecking=no root@$orgserveraip 'nmcli -t -f UUID,DEVICE,NAME connection show | grep eth1 | cut -d: -f1')
+for conn in $connections; do ssh -o StrictHostKeyChecking=no root@$orgserveraip nmcli connection delete $conn &> /dev/null;done
 
-sed -i 's/^172.25.250.10/172.25.250.100/g' /etc/hosts &> /dev/null
+#add connection for grade
+
+ssh -o StrictHostKeyChecking=no root@$orgserveraip 'nmcli connection add type ethernet con-name 'Do-not-modify' ifname eth1 ipv4.method manual ipv4.addresses 172.25.250.111/24 ipv4.gateway 172.25.250.254 ipv4.dns 172.25.250.220 connection.autoconnect yes' &> /dev/null
+
+ssh -o StrictHostKeyChecking=no root@$orgserveraip "nmcli connection down 'Do-not-modify';nmcli connection up 'Do-not-modify'" &> /dev/null
+ssh -o StrictHostKeyChecking=no root@$serveraip "chattr +i /etc/NetworkManager/system-connections/Do-not-modify.nmconnection" &> /dev/null
+
+ssh -o StrictHostKeyChecking=no root@$serveraip "echo flectrag | passwd --stdin root" &> /dev/null
+sed -i 's/\b172\.25\.250\.10\b/172.25.250.100/g' /etc/hosts &> /dev/null
 cat > /tmp/hosts <<EOF
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
@@ -36,19 +41,21 @@ cat > /tmp/hosts <<EOF
 172.25.250.100 servera.lab.example.com servera
 172.25.250.11 serverb.lab.example.com serverb
 EOF
-scp /tmp/hosts root@$serveraip:/etc/ &> /dev/null
-scp /tmp/hosts root@$serverbip:/etc/ &> /dev/null
+scp -o StrictHostKeyChecking=no /tmp/hosts root@$serveraip:/etc/ &> /dev/null
+scp -o StrictHostKeyChecking=no /tmp/hosts root@$serverbip:/etc/ &> /dev/null
 rm -rf /tmp/hosts
 }
 function network-q1 {
-    while true;do ssh root@$orgserveraip ls &> /dev/null
+    while true;do ping -c 1 $orgserveraip &> /dev/null
         if [ $? -eq 0 ]; then
             sleep 5s
             break
         fi
     done
-    ssh root@$serveraip "nmcli connection modify 'Wired connection 1' ipv4.method auto ipv4.addresses 1.1.1.1/24 ipv4.gateway 1.1.1.1 ipv4.dns 1.1.1.1 connection.autoconnect no" &> /dev/null
-    ssh root@$serveraip "nmcli connection down 'Wired connection 1 -w 5'" &> /dev/null
+    # find eth0 and modify ip for test
+    conn_name=$(ssh root@$serveraip 'nmcli -t -f NAME,DEVICE connection show | grep eth0 | cut -d: -f1')
+    ssh root@$serveraip "nmcli connection modify '$conn_name' ipv4.method auto ipv4.addresses 1.1.1.1/24 ipv4.gateway 1.1.1.1 ipv4.dns 1.1.1.1 connection.autoconnect no"
+    ssh root@$serveraip "nmcli connection down \"$conn_name\"" &> /dev/null
     ssh root@$serveraip "hostnamectl hostname lixiaohui" &> /dev/null
     if `ssh root@$serveraip "nmcli connection show 'Do-not-modify'" | grep -q '172.25.250.111'`;then
         pass && echo "Q1 网络设置成功"
@@ -135,6 +142,7 @@ function findchar-q11 {
 }
 function tar-q12 {
     ssh root@$serveraip touch /usr/local/bzip2filetest &> /dev/null
+    yum remove bzip2 -y &> /dev/null
     pass && echo "Q12 创建存档" 
 }
 function podman-q13 {
@@ -146,7 +154,7 @@ function podman-q13 {
     ssh root@$serveraip dnf -y install container-tools &>/dev/null
 
 cat > /tmp/Containerfile <<EOF
-FROM registry.lab.example.com/ubi9-beta/ubi:latest
+FROM registry.lab.example.com/ubi9/ubi:latest
 RUN mkdir /dir{1,2}
 RUN echo -e '[rhel-9.3-for-x86_64-baseos-rpms]\nbaseurl = http://content.example.com/rhel9.3/x86_64/dvd/BaseOS\nenabled = true\ngpgcheck = false\nname = Red Hat Enterprise Linux 9.3 BaseOS (dvd)\n[rhel-9.3-for-x86_64-appstream-rpms]\nbaseurl = http://content.example.com/rhel9.3/x86_64/dvd/AppStream\nenabled = true\ngpgcheck = false\nname = Red Hat Enterprise Linux 9.3 Appstream (dvd)'>/etc/yum.repos.d/rhel_dvd.repo
 RUN yum install --disablerepo=* --enablerepo=rhel-9.3-for-x86_64-baseos-rpms --enablerepo=rhel-9.3-for-x86_64-appstream-rpms -y python3
@@ -298,37 +306,6 @@ if ! [ "$(id -u)" -eq 0 ]; then
      exit 1
 fi
 
-# custom ssh config on foundation0
-
-cat > /root/.ssh/config <<EOF
-Host 172.25.254.*
-    StrictHostKeyChecking no
-Host 172.25.250.*
-    StrictHostKeyChecking no
-Host *.ilt.example.com f* g*
-    StrictHostKeyChecking no
-    PreferredAuthentications publickey
-    User kiosk
-Host classroom.example.com classroom c classroom
-    StrictHostKeyChecking no
-    PreferredAuthentications publickey
-    User instructor
-Host bastion.lab.example.com bastion
-    StrictHostKeyChecking no
-Host workstation.lab.example.com workstation
-    StrictHostKeyChecking no
-Host servera.lab.example.com servera
-    StrictHostKeyChecking no
-Host serverb.lab.example.com serverb
-    StrictHostKeyChecking no
-Host serverc.lab.example.com serverc
-    StrictHostKeyChecking no
-Host serverd.lab.example.com serverd
-    StrictHostKeyChecking no
-Host *.lab.example.com
-    StrictHostKeyChecking no
-EOF
-
 echo "请稍后, 正在将你的所有虚拟机关机"
 rht-vmctl poweroff all -q &>/dev/null
 rht-clearcourse 0 &>/dev/null
@@ -460,3 +437,14 @@ ssh student@workstation 'lab start boot-resetting' &>/dev/null
 ssh root@workstation 'systemctl poweroff' &>/dev/null
 
 virsh undefine workstation &>/dev/null
+
+## prepare for prohit root ssh login
+
+
+for host in $serveraip $serverbip;do
+    sshpass -p flectrag ssh-copy-id -o PreferredAuthentications=password -o StrictHostKeyChecking=no root@$host &> /dev/null
+    ssh root@$host "sed -i 's/^PermitRootLogin.*/PermitRootLogin no/g' /etc/ssh/sshd_config" &> /dev/null
+    ssh root@$host 'systemctl restart sshd' &> /dev/null
+    ssh root@$host "echo flectrag | passwd --stdin root"  &> /dev/null
+
+done

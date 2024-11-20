@@ -11,6 +11,7 @@ serverbip=172.25.250.11
 count=0
 score=0
 ssh root@$serveraip "sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config"
+ssh root@$serveraip "sed -i 's/^PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config"
 ssh root@$serveraip 'systemctl restart sshd'
 
 sshpass -p flectrag ssh -o PreferredAuthentications=password -o StrictHostKeyChecking=no root@serverb "sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/g' /etc/ssh/sshd_config"
@@ -49,13 +50,13 @@ function network-q1 {
     else
         fail && echo "Q1 主机名不是servera.lab.example.com"
     fi
-    if servera_sshpasscmd $serveraip "nmcli connection show 'Wired connection 1' | grep -q '172.25.250.220'"; then
+    if servera_sshpasscmd $serveraip "nmcli connection show 'System eth0' | grep -q '172.25.250.220'"; then
         score=$(expr $score + 1 )
         score1=$(expr $score1 + 2 )
     else
         fail && echo "Q1 DNS不是172.25.250.220"
     fi
-    if servera_sshpasscmd $serveraip "nmcli connection show 'Wired connection 1' | grep -q '172.25.250.254'"; then
+    if servera_sshpasscmd $serveraip "nmcli connection show 'System eth0' | grep -q '172.25.250.254'"; then
         score=$(expr $score + 1 )
         score1=$(expr $score1 + 2 )
     else
@@ -68,13 +69,13 @@ function network-q1 {
 }
 function repository-q2 {
     score2=0
-    if servera_sshpasscmd $serveraip "dnf repoinfo 2>/dev/null | grep -q http://content/rhel9.0/x86_64/dvd/BaseOS"; then
+    if servera_sshpasscmd $serveraip "dnf repoinfo 2>/dev/null | grep -q http://content/rhel9.3/x86_64/dvd/BaseOS"; then
         score=$(expr $score + 1 )
         score2=$(expr $score2 + 2 )
     else
         fail && echo "Q2 BaseOS 不存在"
     fi
-    if servera_sshpasscmd $serveraip "dnf repoinfo 2>/dev/null | grep -q http://content/rhel9.0/x86_64/dvd/AppStream"; then
+    if servera_sshpasscmd $serveraip "dnf repoinfo 2>/dev/null | grep -q http://content/rhel9.3/x86_64/dvd/AppStream"; then
         score=$(expr $score + 1 )
         score2=$(expr $score2 + 2 )
     else
@@ -173,15 +174,27 @@ function create-user-q4 {
     fi
 
 }
-function cron-q5 {
-    score5=0
+function cron-q5a {
+    score5a=0
     if servera_sshpasscmd $serveraip "crontab -u harry -l 2> /dev/null | grep -q '23 14'"; then
         score=$(expr $score + 1 )
-        score5=$(expr $score5 + 2 )
+        score5a=$(expr $score5a + 2 )
         count=$(expr $count + 1 )     
-        pass && echo "Q5 配置Cron作业"
+        pass && echo "Q5A 配置Cron作业"
     else
-        fail && echo "Q5 harry用户不存在或crontab的时间设置不正确"
+        fail && echo "Q5A harry用户不存在或crontab的时间设置不正确"
+    fi
+
+}
+function cron-q5b {
+    score5b=0
+    if servera_sshpasscmd $serveraip "crontab -u natasha -l 2> /dev/null | grep -q '*/2'"; then
+        score=$(expr $score + 1 )
+        score5b=$(expr $score5b + 2 )
+        count=$(expr $count + 1 )     
+        pass && echo "Q5B 配置Cron作业"
+    else
+        fail && echo "Q5B harry用户不存在或crontab的时间设置不正确"
     fi
 
 }
@@ -327,26 +340,26 @@ function podman-q13 {
         fail && echo "Q13 本地没有pdf镜像"
     fi
 }
-function podman-q14 {
+function podman-q14a {
     q14score=0
     if sshpass -p flectrag ssh -A -g -o StrictHostKeyChecking=no wallah@$serveraip podman ps 2> /dev/null | grep -q ascii2pdf; then
         score=$(expr $score + 1 )
         q14score=$(expr $q14score + 2 )
     else
-        fail && echo "Q14 ascii2pdf容器不存在"
+        fail && echo "Q14A ascii2pdf容器不存在"
     fi
     if sshpass -p flectrag ssh -A -g -o StrictHostKeyChecking=no wallah@$serveraip podman inspect ascii2pdf 2> /dev/null | grep -q '/opt/file'; then
         score=$(expr $score + 1 )
         q14score=$(expr $q14score + 2 )
     else
-        fail && echo "Q14 容器没有使用/opt/file"
+        fail && echo "Q14A 容器没有使用/opt/file"
     fi
 
     if sshpass -p flectrag ssh -A -g -o StrictHostKeyChecking=no wallah@$serveraip podman inspect ascii2pdf 2> /dev/null | grep -q '/opt/progress'; then
         score=$(expr $score + 1 )
         q14score=$(expr $q14score + 2 )
     else
-        fail && echo "Q14 容器没有使用/opt/progress"
+        fail && echo "Q14A 容器没有使用/opt/progress"
     fi
 
     if sshpass -p flectrag ssh -A -g -o StrictHostKeyChecking=no wallah@$serveraip systemctl --user is-enabled container-ascii2pdf &> /dev/null \
@@ -354,12 +367,40 @@ function podman-q14 {
         score=$(expr $score + 1 )
         q14score=$(expr $q14score + 2 )
     else
-        fail && echo "Q14 container-ascii2pdf服务不存在或者未enable和linger=yes"
+        fail && echo "Q14A container-ascii2pdf服务不存在或者未enable和linger=yes"
     fi
       
     if [ $q14score -gt 7 ]; then
         count=$(expr $count + 1 )
-        pass && echo "Q14 将容器配置为服务"
+        pass && echo "Q14A 将容器配置为服务"
+    fi
+
+}
+function podman-q14b {
+    q14bscore=0
+    if sshpass -p flectrag ssh -A -g -o StrictHostKeyChecking=no wallah@$serveraip podman ps 2> /dev/null | grep -q nginx; then
+        score=$(expr $score + 1 )
+        q14bscore=$(expr $q14bscore + 2 )
+    else
+        fail && echo "Q14B nginx容器不存在"
+    fi
+    if sshpass -p flectrag ssh -A -g -o StrictHostKeyChecking=no wallah@$serveraip podman inspect nginx 2> /dev/null | grep -q '/home/wallah/www'; then
+        score=$(expr $score + 1 )
+        q14bscore=$(expr $q14bscore + 2 )
+    else
+        fail && echo "Q14B 容器没有使用/home/wallah/www"
+    fi
+    if sshpass -p flectrag ssh -A -g -o StrictHostKeyChecking=no wallah@$serveraip systemctl --user is-enabled container-nginx &> /dev/null \
+    && sshpass -p flectrag ssh -A -g -o StrictHostKeyChecking=no wallah@$serveraip loginctl show-user wallah | grep -q Linger=yes &>/dev/null; then
+        score=$(expr $score + 1 )
+        q14bscore=$(expr $q14bscore + 2 )
+    else
+        fail && echo "Q14B container-nginx服务不存在或者未enable和linger=yes"
+    fi
+      
+    if [ $q14bscore -gt 5 ]; then
+        count=$(expr $count + 1 )
+        pass && echo "Q14B 将容器配置为服务"
     fi
 
 }
@@ -400,7 +441,7 @@ function alias-q16b {
         count=$(expr $count + 1 )
         pass && echo "Q16B 配置应用"
     else
-        fail && echo "Q16B 没有在natasha用户家目录的.bashrc中发现正确的alias定义"
+        fail && echo "Q16B 没有在natasha用户家目录的.bashrc中发现ex200的alias定义"
     fi
 
 }
@@ -503,13 +544,13 @@ function root-password-q17 {
 }
 function repository-q18 {
     score18=0
-    if servera_sshpasscmd $serverbip "dnf repoinfo 2>/dev/null | grep -q http://content/rhel9.0/x86_64/dvd/BaseOS" 2> /dev/null; then
+    if servera_sshpasscmd $serverbip "dnf repoinfo 2>/dev/null | grep -q http://content/rhel9.3/x86_64/dvd/BaseOS" 2> /dev/null; then
         score=$(expr $score + 1 )
         score18=$(expr $score18 + 2 )
     else
         fail && echo "Q18 BaseOS 不存在"
     fi
-    if servera_sshpasscmd $serverbip "dnf repoinfo 2>/dev/null | grep -q http://content/rhel9.0/x86_64/dvd/AppStream" 2> /dev/null; then
+    if servera_sshpasscmd $serverbip "dnf repoinfo 2>/dev/null | grep -q http://content/rhel9.3/x86_64/dvd/AppStream" 2> /dev/null; then
         score=$(expr $score + 1 )
         score18=$(expr $score18 + 2 )
     else
@@ -624,7 +665,8 @@ network-q1
 repository-q2
 selinux-q3
 create-user-q4
-cron-q5
+cron-q5a
+cron-q5b
 create-folder-q6
 configure-ntp-q7
 autofs-q8
@@ -633,7 +675,8 @@ findfile-q10
 findchar-q11
 tar-q12
 podman-q13
-podman-q14
+podman-q14a
+podman-q14b
 sudo-q15
 umask-q16
 alias-q16b
@@ -650,9 +693,9 @@ tuned-q22
 echo
 echo '===================================================================='
 echo
-# total score is 57, calc your score
+# total score is 61, calc your score
 
-yourscore=$((score * 300 / 57))
+yourscore=$((score * 300 / 61))
 
 if [ $yourscore -gt 210 ];then
   pass && echo "你本次的得分为: $yourscore, 通过了测试"
