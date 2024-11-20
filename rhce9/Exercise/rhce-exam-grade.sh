@@ -733,10 +733,10 @@ q18score=0
 
 function prepare_servera {
     rht-vmctl poweroff servera -q &> /dev/null
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/servera-b.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/servera-c.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/servera-d.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/servera-e.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/servera-b.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/servera-c.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/servera-d.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/servera-e.qcow2
     virsh detach-disk servera vdb --live --config &> /dev/null
     virsh attach-disk servera /var/lib/libvirt/images/servera-b.qcow2 vdb --config --subdriver qcow2 &> /dev/null
     virsh attach-disk servera /var/lib/libvirt/images/servera-c.qcow2 vdc --config --subdriver qcow2 &> /dev/null
@@ -748,10 +748,10 @@ function prepare_servera {
 
 function prepare_serverb {
     rht-vmctl poweroff serverb -q &> /dev/null
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverb-b.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverb-c.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverb-d.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverb-e.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverb-b.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverb-c.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverb-d.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverb-e.qcow2
     qemu-img create -f qcow2 /var/lib/libvirt/images/serverb-f.qcow2 1000M &> /dev/null
     qemu-img create -f qcow2 /var/lib/libvirt/images/serverb-g.qcow2 1000M &> /dev/null
 
@@ -767,10 +767,10 @@ function prepare_serverb {
 
 function prepare_serverc {
     rht-vmctl poweroff serverc -q &> /dev/null
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverc-b.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverc-c.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverc-d.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverc-e.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverc-b.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverc-c.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverc-d.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverc-e.qcow2
     qemu-img create -f qcow2 /var/lib/libvirt/images/serverc-f.qcow2 2G &> /dev/null
 
     virsh detach-disk serverc vdb --live --config &> /dev/null
@@ -784,10 +784,10 @@ function prepare_serverc {
 
 function prepare_serverd {
     rht-vmctl poweroff serverd -q &> /dev/null
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverd-b.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverd-c.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverd-d.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverd-e.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverd-b.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverd-c.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverd-d.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/serverd-e.qcow2
     virsh attach-disk serverd /var/lib/libvirt/images/serverd-c.qcow2 vdc --config --subdriver qcow2 &> /dev/null
     virsh attach-disk serverd /var/lib/libvirt/images/serverd-d.qcow2 vdd --config --subdriver qcow2 &> /dev/null
     virsh attach-disk serverd /var/lib/libvirt/images/serverd-e.qcow2 vde --config --subdriver qcow2 &> /dev/null
@@ -797,10 +797,10 @@ function prepare_serverd {
 
 function prepare_workstation {
     rht-vmctl poweroff workstation -q &> /dev/null
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/workstation-b.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/workstation-c.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/workstation-d.qcow2
-    cp /content/rhel9.0/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/workstation-e.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/workstation-b.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/workstation-c.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/workstation-d.qcow2
+    cp /content/rhel9.3/x86_64/vms/rh134-servera-vdb.qcow2 /var/lib/libvirt/images/workstation-e.qcow2
     virsh detach-disk workstation vdb --config &> /dev/null
     virsh attach-disk workstation /var/lib/libvirt/images/workstation-b.qcow2 vdb --config --subdriver qcow2 &> /dev/null
     virsh attach-disk workstation /var/lib/libvirt/images/workstation-c.qcow2 vdc --config --subdriver qcow2 &> /dev/null
