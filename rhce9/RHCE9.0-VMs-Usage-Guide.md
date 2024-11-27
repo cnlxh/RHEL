@@ -59,11 +59,11 @@ https://support.broadcom.com/group/ecx/productdownloads?subfamily=VMware%20Works
 
 你下载的资料如果是很多压缩包，例如xxx.7z之类的字眼，就解压一下，会得到VMware 的原始文件，如果是下载的VMware 原始文件，例如xxx.vmdk，在所有文件都下载完成后，执行下一步的导入操作，不管是解压的还是直接下载的，最后你都会得到一个文件夹，我们的虚拟机都从这个文件夹中导入，具体步骤如下：
 
-打开已安装的VMware workstation软件，点击软件左上角的 `文件` ---> `打开` ，双击你得到的文件夹，找到`RHCE90.vmx`或其他名字但后缀名是 `vmx` 的文件
+打开已安装的VMware workstation软件，点击软件左上角的 `文件` ---> `打开` ，双击你得到的文件夹，找到后缀名是 `vmx` 的文件
 
 ![menu-file-open](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vmware/menu-file-open.png)
 
-双击文件夹后，会看到一个 `RHCE90.vmx` 或是其他名字但后缀是 `vmx` 的文件，选中后，点击 `打开` 按钮就可以导入此虚拟机了
+打开文件夹后，会看到一个后缀是 `vmx` 的文件，例如我下图举例的RHCE90.vmx，你只需要确保后缀是vmx即可，不用管文件名是什么，选中后，点击 `打开` 按钮就可以导入此虚拟机了
 
 ![open-rhce9-vm](https://gitee.com/cnlxh/rhel/raw/master/rhce9/images/vmware/open-rhce9-vm.png)
 
