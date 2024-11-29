@@ -110,12 +110,15 @@ for vm in $servers;do
 	sleep 5s
 done
 
-while true;do
-	ping -c1 $vm &> /dev/null
-	if [ $? -ne 0 ];then
-		sleep 1
-	else
-		break
-	fi
-done
+# waiting for vms online
 
+for vms in $servers;do
+	while true;do
+		ping -c1 $vms &> /dev/null
+		if [ $? -ne 0 ];then
+			sleep 1
+		else
+			break
+		fi
+	done
+done
