@@ -81,7 +81,7 @@ cd /home/kiosk/Exercise
 bash rhcsa-exam-setup.sh
 ```
 
-3. 根据`rh200.html`答题完毕后，执行以下步骤进行判断对错
+3. 根据`rh200.md`答题完毕后，执行以下步骤进行判断对错
 
 ```bash
 cd /home/kiosk/Exercise
@@ -109,7 +109,7 @@ cd /home/kiosk/Exercise
 bash rhce-exam-setup.sh
 ```
 
-3. 根据`rh294.html`答题完毕后，执行以下步骤进行判断对错
+3. 根据`rh294.md`答题完毕后，执行以下步骤进行判断对错
 
 ```bash
 cd /home/kiosk/Exercise
